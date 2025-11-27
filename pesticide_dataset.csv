@@ -1,0 +1,49 @@
+Crop,Pest,Pesticide
+Wheat,Aphid,Imidacloprid
+Wheat,Armyworm,Chlorpyrifos
+Wheat,Stem Borer,Fipronil
+Wheat,Termite,Chlorpyrifos
+Rice,Brown Planthopper,Buprofezin
+Rice,Stem Borer,Cartap Hydrochloride
+Rice,Leaf Folder,Chlorantraniliprole
+Rice,Hispa,Quinalphos
+Maize,Fall Armyworm,Spinosad
+Maize,Stem Borer,Chlorantraniliprole
+Maize,Shoot Fly,Carbofuran
+Maize,Rootworm,Tefluthrin
+Cotton,Bollworm,Quinalphos
+Cotton,Aphid,Thiamethoxam
+Cotton,Whitefly,Imidacloprid
+Cotton,Thrips,Emamectin Benzoate
+Tomato,Aphid,Acetamiprid
+Tomato,Whitefly,Imidacloprid
+Tomato,Fruit Borer,Spinosad
+Tomato,Leaf Miner,Cypermethrin
+Potato,Leaf Miner,Cypermethrin
+Potato,Blight,Mancozeb
+Potato,Aphid,Dimethoate
+Potato,Cutworm,Chlorpyrifos
+Sugarcane,Early Shoot Borer,Chlorantraniliprole
+Sugarcane,Root Borer,Fipronil
+Sugarcane,White Grub,Imidacloprid
+Sugarcane,Top Borer,Quinalphos
+Soybean,Aphid,Thiamethoxam
+Soybean,Stem Fly,Chlorpyrifos
+Soybean,Girdle Beetle,Imidacloprid
+Soybean,Leaf Miner,Spinosad
+Groundnut,Leaf Miner,Chlorpyrifos
+Groundnut,Aphid,Dimethoate
+Groundnut,Jassid,Imidacloprid
+Groundnut,Thrips,Fipronil
+Chili,Thrips,Spinosad
+Chili,Whitefly,Imidacloprid
+Chili,Fruit Borer,Emamectin Benzoate
+Chili,Aphid,Thiamethoxam
+Brinjal,Fruit Borer,Cypermethrin
+Brinjal,Jassid,Acetamiprid
+Brinjal,Whitefly,Imidacloprid
+Brinjal,Stem Borer,Fipronil
+Onion,Thrips,Spinosad
+Onion,Maggot,Chlorpyrifos
+Onion,Leaf Miner,Abamectin
+Onion,Cutworm,Carbaryl

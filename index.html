@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>🌾 Agri Tech — Dashboard</title>
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Chart.js for NPK visualization -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    /* --- 1. Base Styles & Theme --- */
+    :root {
+      --bg1: #051937;
+      --bg2: #004d92;
+      --glass: rgba(255, 255, 255, 0.07);
+      --accent: #00d4ff;
+      --accent-2: #7bffb2;
+      --muted: #cfe8ff;
+      --card-radius: 14px;
+      --shadow: 0 8px 30px rgba(2, 6, 23, 0.5);
+      --glass-border: rgba(255, 255, 255, 0.1);
+      font-family: 'Inter', "Segoe UI", Roboto, Arial, sans-serif;
+    }
+
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: radial-gradient(circle at 10% 10%, rgba(0, 212, 255, 0.06), transparent 8%),
+                  linear-gradient(135deg, var(--bg1), var(--bg2));
+      color: #e9f6ff;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      overflow-y: auto;
+    }
+
+    /* --- 2. Layout --- */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 80;
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      border-bottom: 1px solid var(--glass-border);
+      backdrop-filter: blur(8px);
+    }
+    .brand { display: flex; gap: 12px; align-items: center; }
+    .logo {
+      width: 56px; height: 56px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+      font-weight: 800; color: #012; font-size: 24px;
+      transform: rotate(-10deg);
+    }
+    h1 { font-size: 18px; margin: 0; color: #fff; }
+    p.subtitle { margin: 0; opacity: 0.9; font-size: 13px; color: var(--muted); }
+
+    nav { display: flex; gap: 8px; align-items: center; }
+
+    .main {
+      display: grid;
+      grid-template-columns: 220px 1fr;
+      gap: 18px;
+      max-width: 1200px;
+      margin: 20px auto;
+      padding: 0 18px 60px;
+      align-items: start;
+    }
+
+    .sidebar {
+      position: sticky;
+      top: 95px; /* Adjusted for header height */
+      align-self: start;
+      background: var(--glass);
+      border-radius: 12px;
+      padding: 14px;
+      border: 1px solid var(--glass-border);
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .side-section { font-size: 13px; color: var(--muted); margin-bottom: 6px; padding: 0 8px; }
+
+    .content { min-height: 520px; display: flex; flex-direction: column; gap: 12px; }
+
+    /* --- 3. Components --- */
+    .page { display: none; animation: fadeIn .24s ease; }
+    .page.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+    .card {
+      background: var(--glass);
+      border-radius: var(--card-radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(8px);
+    }
+    .card h2 { margin: 6px 0 12px 0; font-size: 16px; color: #f8fffb; }
+    .muted { color: var(--muted); font-size: 13px; }
+
+    .btn, .nav-btn, .side-link {
+      background: transparent;
+      color: var(--muted);
+      border: none;
+      padding: 9px 14px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all .18s ease;
+      text-align: left;
+      font-size: 14px;
+    }
+    .btn:hover, .nav-btn:hover, .side-link:hover {
+      transform: translateY(-2px);
+      color: #fff;
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .btn.active, .nav-btn.active, .side-link.active {
+      color: #012;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    }
+     .btn.primary {
+      color: #012;
+      background: linear-gradient(90deg, var(--accent), var(--accent-2));
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+    }
+    .btn.secondary { background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.1); box-shadow:none; }
+
+    label { display: block; font-size: 13px; margin: 12px 0 6px 0; color: #dff7ff; }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--glass-border);
+      background: rgba(0, 0, 0, 0.2);
+      color: #fff;
+      outline: none;
+      box-sizing: border-box;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+    }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+    
+    select option {
+      background: var(--bg2);
+      color: #e9f6ff;
+    }
+
+    /* Chat UI */
+    .chat { display: flex; flex-direction: column; height: 450px; }
+    .messages { flex: 1; overflow: auto; padding: 12px; border-radius: 10px; background: rgba(0, 0, 0, 0.15); border: 1px solid var(--glass-border); margin-bottom: 10px; }
+    .msg { margin: 8px 0; max-width: 86%; padding: 10px 14px; border-radius: 14px; line-height: 1.4; word-wrap: break-word; }
+    .msg.user { margin-left: auto; background: linear-gradient(90deg, #003a8c, #0057d2); color: #fff; text-align: right; }
+    .msg.bot { margin-right: auto; background: rgba(255, 255, 255, 0.05); color: #e7fcff; text-align: left; }
+    .msg.bot.loading::after { content: '...'; display: inline-block; animation: dots 1s infinite steps(3, end); }
+    @keyframes dots { 0%, 20% { opacity: 0; } 40% { opacity: 1; } }
+    
+    .chat-input { display: flex; gap: 8px; }
+
+    /* --- NEW: Floating Chat Styles --- */
+    .chat-fab {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #012;
+      font-size: 28px;
+      border: none;
+      cursor: pointer;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s ease;
+    }
+    .chat-fab:hover {
+      transform: scale(1.1);
+    }
+    .chat-modal-container {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.4);
+      z-index: 999;
+      display: none; /* Hidden by default */
+      align-items: flex-end;
+      justify-content: flex-end;
+      backdrop-filter: blur(5px);
+      padding: 30px;
+    }
+    .chat-modal-container.show {
+      display: flex;
+    }
+    .chat-modal {
+      width: 450px;
+      max-width: 95vw;
+      background: var(--glass);
+      border-radius: var(--card-radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--glass-border);
+      backdrop-filter: blur(12px);
+      animation: slideIn 0.3s ease-out;
+    }
+    @keyframes slideIn { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+    .chat-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    .chat-modal-header h2 { margin: 0; font-size: 16px; }
+    .close-btn {
+      background: transparent;
+      border: none;
+      font-size: 28px;
+      line-height: 1;
+      color: var(--muted);
+      cursor: pointer;
+      padding: 0 5px;
+    }
+    .close-btn:hover { color: #fff; }
+
+    /* --- 4. Responsive Design --- */
+    @media (max-width: 980px) {
+      .main { grid-template-columns: 1fr; padding: 0 12px; }
+      .sidebar { position: relative; top: 0; flex-direction: row; overflow-x: auto; height: auto; scrollbar-width: none; }
+      .sidebar::-webkit-scrollbar { display: none; }
+      .side-link { white-space: nowrap; }
+      .header { padding: 12px; }
+      nav { display: none; }
+    }
+    @media (max-width: 600px) {
+        .dashboard-grid, .home-grid { grid-template-columns: 1fr; }
+        .chat-modal-container { padding: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <div class="brand">
+      <div class="logo">AT</div>
+      <div>
+        <h1>Agri Tech</h1>
+        <p class="subtitle">AI-Powered Agricultural Insights</p>
+      </div>
+    </div>
+    <nav>
+      <button class="nav-btn active" data-target="homePage">Home</button>
+      <button class="nav-btn" data-target="dashPage">Dashboards</button>
+      <button class="nav-btn" data-target="aboutPage">About</button>
+      <button class="nav-btn" data-target="contactPage">Contact</button>
+    </nav>
+  </div>
+
+  <div class="main">
+    <aside class="sidebar" aria-label="Sidebar">
+      <div class="side-link active" data-target="homePage"> Home</div>
+      <div class="side-link" data-target="dashPage"> Dashboards</div>
+      <div class="side-link" data-target="aboutPage"> About</div>
+      <div class="side-link" data-target="contactPage"> Contact</div>
+    </aside>
+
+    <main class="content">
+      <section id="homePage" class="page active">
+        <div class="card">
+          <h2>Welcome, Farmer! 👋</h2>
+          <p class="muted">Your AI-powered assistant for modern farming in Andhra Pradesh. Access weather forecasts, get crop recommendations based on soil data, find the right pesticide, or chat with our AI for expert advice by clicking the chat icon in the corner.</p>
+        </div>
+        <div class="home-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+            <div class="card">
+                <h3>🌤️ Local Weather</h3>
+                <p class="muted">Get a quick weather check for your location. The climate data will auto-fill the crop recommendation form.</p>
+                <button class="btn" data-target="dashPage">Go to Weather Dashboard</button>
+            </div>
+            <div class="card">
+                <h3>🌱 Crop Predictions</h3>
+                <p class="muted">Input your soil's NPK values and local climate data to get an instant crop recommendation from our ML model.</p>
+                <button class="btn" data-target="dashPage">Go to Crop Dashboard</button>
+            </div>
+        </div>
+      </section>
+
+      <section id="dashPage" class="page">
+        <div class="dashboard-grid" style="display:grid; grid-template-columns:1fr 1.2fr 1fr; gap:12px">
+          <div class="card" id="weatherCard">
+            <h2>🌤️ Weather</h2>
+            <div class="muted">Enter a location to auto-fill climate data below.</div>
+            <label for="weatherLocation">Location</label>
+            <input id="weatherLocation" type="text" value="Anantapur" placeholder="e.g., Sircilla,IN" />
+            <button class="btn primary" id="getWeatherBtn" style="margin-top:10px; width: 100%;">Get Weather</button>
+            <div id="weatherResult" style="margin-top:12px; display:none;">
+              <div class="small" id="weatherCity"></div>
+              <div style="font-size: 28px; font-weight: 700; margin: 4px 0;" id="weatherTemp"></div>
+              <div id="weatherCond" style="font-weight:700"></div>
+              <div class="muted" id="weatherExtra" style="font-size: 12px;"></div>
+            </div>
+             <div class="muted" id="weatherError" style="margin-top: 10px; color: #ff8a8a;"></div>
+          </div>
+
+          <div class="card" id="cropCard">
+            <h2>🌱 Crop Recommendation</h2>
+            <div class="muted">Enter soil & climate data to get a suggestion.</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 8px;">
+                <div><label>Nitrogen (N) <span class="muted">(0-140)</span></label><input id="nutN" type="number" value="90" /></div>
+                <div><label>Phosphorus (P) <span class="muted">(5-145)</span></label><input id="nutP" type="number" value="42" /></div>
+                <div><label>Potassium (K) <span class="muted">(5-205)</span></label><input id="nutK" type="number" value="43" /></div>
+                <div><label>Temp (°C) <span class="muted">(8-44)</span></label><input id="temp" type="number" value="21" step="0.1"/></div>
+                <div><label>Humidity (%) <span class="muted">(14-100)</span></label><input id="humidity" type="number" value="82" step="0.1"/></div>
+                <div><label>pH <span class="muted">(3.5-9.9)</span></label><input id="ph" type="number" value="6.5" step="0.1"/></div>
+                <div style="grid-column: span 3;"><label>Rainfall (mm) <span class="muted">(20-299)</span></label><input id="rain" type="number" value="203" step="1"/></div>
+            </div>
+            <button class="btn primary" id="recommendBtn" style="margin-top:12px; width: 100%;">Recommend Crop</button>
+            <div style="margin-top:14px;">
+              <div class="muted">Prediction Result</div>
+              <div id="recChip" class="chip" style="font-size: 16px; padding: 8px 14px; margin-top: 8px;">No prediction yet</div>
+            </div>
+          </div>
+          
+          <div class="card" id="pestCard">
+            <h2>🧴 Pesticide Recommendation</h2>
+            <div class="muted">Select your crop and the identified pest.</div>
+            <label>Crop</label><select id="cropSelect"><option>Loading crops...</option></select>
+            <label>Pest</label><select id="pestSelect"><option>Select a crop first...</option></select>
+            <button class="btn primary" id="getPestBtn" style="margin-top:12px; width: 100%;">Get Pesticide</button>
+            <div style="margin-top:12px;">
+              <div class="muted">Recommended Pesticide</div>
+              <div id="pesticideResult" style="margin-top:8px;font-weight:700; color: var(--accent-2)">—</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="aboutPage" class="page">
+        <div class="card">
+          <h2>About Smart Farmer assistant</h2>
+          <p class="muted">This project is a comprehensive, AI-powered tool designed to assist farmers in Andhra Pradesh with data-driven decision-making. It leverages a machine learning model for crop recommendations and integrates with powerful APIs for real-time weather data and expert-level agricultural advice through an AI chatbot.</p>
+        </div>
+      </section>
+
+      <section id="contactPage" class="page">
+        <div class="card">
+          <h2>Contact Us</h2>
+          <div class="muted">Questions or support? Send a message.</div>
+          <label>Your Name</label><input id="contactName" type="text" placeholder="Full name" />
+          <label>Your Email</label><input id="contactEmail" type="email" placeholder="name@example.com" />
+          <label>Message</label><textarea id="contactMessage" rows="5" placeholder="How can we help?"></textarea>
+          <button class="btn primary" id="sendContact" style="margin-top:12px;">Send Message</button>
+          <div class="muted" id="contactStatus" style="margin-top:10px"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- NEW: Floating Action Button for Chat -->
+  <button id="openChatBtn" class="chat-fab" aria-label="Open Chat">💬</button>
+
+  <!-- NEW: Chat Modal -->
+  <div id="chatModal" class="chat-modal-container">
+    <div class="chat-modal">
+        <div class="chat-modal-header">
+            <h2>AI Farm Assistant</h2>
+            <button id="closeChatBtn" class="close-btn" aria-label="Close Chat">&times;</button>
+        </div>
+        <div class="chat">
+            <div class="messages" id="chatMessages">
+                <div class="msg bot">Hello! I'm your AI Farm Assistant. Ask me anything about farming in Andhra Pradesh.</div>
+            </div>
+            <div class="chat-input">
+                <input id="chatInput" type="text" placeholder="Ask about crops, pests..." />
+                <button class="btn primary" id="chatSend">Send</button>
+            </div>
+        </div>
+    </div>
+  </div>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+    const API_BASE_URL = "http://127.0.0.1:8000";
+
+    const navLinks = document.querySelectorAll('.nav-btn[data-target], .side-link[data-target]');
+    const pages = document.querySelectorAll('.page');
+
+    function setActiveSection(targetId) {
+        pages.forEach(page => page.classList.toggle('active', page.id === targetId));
+        navLinks.forEach(link => link.classList.toggle('active', link.dataset.target === targetId));
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            if (e.currentTarget.dataset.target) {
+                setActiveSection(e.currentTarget.dataset.target)
+            }
+        });
+    });
+
+    // --- Weather API & Crop Form Integration ---
+    const getWeatherBtn = document.getElementById('getWeatherBtn');
+    const weatherLocation = document.getElementById('weatherLocation');
+    const weatherResultEl = document.getElementById('weatherResult');
+    const weatherErrorEl = document.getElementById('weatherError');
+
+    async function fetchWeather() {
+        const location = weatherLocation.value.trim();
+        if (!location) { weatherErrorEl.textContent = "Please enter a location."; return; }
+        weatherErrorEl.textContent = "";
+        getWeatherBtn.textContent = "Fetching...";
+        getWeatherBtn.disabled = true;
+
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/weather?q=${encodeURIComponent(location)}`);
+            if (!response.ok) {
+                const errData = await response.json();
+                throw new Error(errData.detail || `HTTP error ${response.status}`);
+            }
+            const data = await response.json();
+            
+            document.getElementById('weatherCity').textContent = `${data.name}, ${data.sys.country}`;
+            document.getElementById('weatherTemp').textContent = `${Math.round(data.main.temp)}°C`;
+            document.getElementById('weatherCond').textContent = data.weather[0].description.charAt(0).toUpperCase() + data.weather[0].description.slice(1);
+            document.getElementById('weatherExtra').textContent = `Humidity: ${data.main.humidity}% • Wind: ${data.wind.speed} m/s`;
+            weatherResultEl.style.display = 'block';
+
+            const tempInput = document.getElementById('temp');
+            const humidityInput = document.getElementById('humidity');
+            if (tempInput && humidityInput && data.main) {
+                tempInput.value = (Math.round(data.main.temp * 10) / 10).toFixed(1);
+                humidityInput.value = data.main.humidity.toFixed(1);
+                [tempInput, humidityInput].forEach(input => {
+                    input.style.borderColor = 'var(--accent-2)';
+                    setTimeout(() => { input.style.borderColor = 'var(--glass-border)'; }, 2500);
+                });
+            }
+        } catch (error) {
+            weatherErrorEl.textContent = `Error: ${error.message}`;
+            weatherResultEl.style.display = 'none';
+        } finally {
+            getWeatherBtn.textContent = "Get Weather";
+            getWeatherBtn.disabled = false;
+        }
+    }
+    getWeatherBtn.addEventListener('click', fetchWeather);
+    fetchWeather(); 
+
+    // --- Crop Recommendation API ---
+    const recommendBtn = document.getElementById('recommendBtn');
+    const recChip = document.getElementById('recChip');
+    
+    recommendBtn.addEventListener('click', async () => {
+        const payload = {
+            N: parseFloat(document.getElementById('nutN').value),
+            P: parseFloat(document.getElementById('nutP').value),
+            K: parseFloat(document.getElementById('nutK').value),
+            temperature: parseFloat(document.getElementById('temp').value),
+            humidity: parseFloat(document.getElementById('humidity').value),
+            ph: parseFloat(document.getElementById('ph').value),
+            rainfall: parseFloat(document.getElementById('rain').value)
+        };
+        recChip.textContent = "Predicting...";
+        recommendBtn.disabled = true;
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/predict`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!response.ok) {
+                 const errData = await response.json();
+                throw new Error(errData.detail || `HTTP error ${response.status}`);
+            }
+            const data = await response.json();
+            recChip.textContent = `🌱 ${data.recommended_crop}`;
+        } catch (error) {
+            recChip.textContent = `Error: ${error.message}`;
+        } finally {
+            recommendBtn.disabled = false;
+        }
+    });
+
+    // --- Pesticide Recommendation API ---
+    const cropSelect = document.getElementById('cropSelect');
+    const pestSelect = document.getElementById('pestSelect');
+    const getPestBtn = document.getElementById('getPestBtn');
+    const pesticideResultEl = document.getElementById('pesticideResult');
+
+    async function populateCrops() {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/crops`);
+            if (!response.ok) throw new Error(`API Error: ${response.status}`);
+            const data = await response.json();
+            if (!data.crops || !data.crops.length) throw new Error("No crops returned from API.");
+            cropSelect.innerHTML = '<option value="">-- Select a Crop --</option>';
+            data.crops.forEach(crop => cropSelect.add(new Option(crop, crop)));
+        } catch (error) {
+            console.error("Failed to populate crops:", error);
+            cropSelect.innerHTML = '<option value="">Error loading crops</option>';
+        }
+    }
+
+    cropSelect.addEventListener('change', async () => {
+        const selectedCrop = cropSelect.value;
+        pestSelect.innerHTML = '<option>Loading pests...</option>';
+        pesticideResultEl.textContent = '—';
+        if (!selectedCrop) {
+            pestSelect.innerHTML = '<option>Select a crop first...</option>';
+            return;
+        }
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/pests?crop=${encodeURIComponent(selectedCrop)}`);
+            if (!response.ok) throw new Error(`API Error: ${response.status}`);
+            const data = await response.json();
+            if (!data.pests || !data.pests.length) {
+                pestSelect.innerHTML = '<option value="">No pests for this crop</option>';
+                return;
+            }
+            pestSelect.innerHTML = '<option value="">-- Select a Pest --</option>';
+            data.pests.forEach(pest => pestSelect.add(new Option(pest, pest)));
+        } catch (error) {
+            console.error("Failed to populate pests:", error);
+            pestSelect.innerHTML = '<option value="">Error loading pests</option>';
+        }
+    });
+    
+    getPestBtn.addEventListener('click', async () => {
+        const crop = cropSelect.value;
+        const pest = pestSelect.value;
+        if (!crop || !pest) {
+            pesticideResultEl.textContent = "Please select both a crop and a pest.";
+            return;
+        }
+        pesticideResultEl.textContent = "Searching...";
+        try {
+             const response = await fetch(`${API_BASE_URL}/api/pesticides?crop=${encodeURIComponent(crop)}&pest=${encodeURIComponent(pest)}`);
+              if (!response.ok) {
+                 const errData = await response.json();
+                throw new Error(errData.detail || `HTTP error ${response.status}`);
+            }
+            const data = await response.json();
+            pesticideResultEl.textContent = data.pesticide;
+        } catch (error) {
+            pesticideResultEl.textContent = `Error: ${error.message}`;
+        }
+    });
+
+    // --- AI Chatbot (Now in a Modal) ---
+    const chatModal = document.getElementById('chatModal');
+    const openChatBtn = document.getElementById('openChatBtn');
+    const closeChatBtn = document.getElementById('closeChatBtn');
+    const chatMessages = document.getElementById('chatMessages');
+    const chatInput = document.getElementById('chatInput');
+    const chatSendBtn = document.getElementById('chatSend');
+
+    openChatBtn.addEventListener('click', () => chatModal.classList.add('show'));
+    closeChatBtn.addEventListener('click', () => chatModal.classList.remove('show'));
+    chatModal.addEventListener('click', (e) => {
+        if (e.target === chatModal) {
+            chatModal.classList.remove('show');
+        }
+    });
+
+    function appendMsg(role, text) {
+        const msgDiv = document.createElement('div');
+        msgDiv.className = `msg ${role}`;
+        msgDiv.textContent = text;
+        chatMessages.appendChild(msgDiv);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+        return msgDiv;
+    }
+
+    async function sendChat() {
+        const message = chatInput.value.trim();
+        if (!message) return;
+        appendMsg('user', message);
+        chatInput.value = '';
+        const loadingMsg = appendMsg('bot', 'AI is thinking...');
+        loadingMsg.classList.add('loading');
+        
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message })
+            });
+             if (!response.ok) {
+                 const errData = await response.json();
+                throw new Error(errData.detail || `OpenAI API Error ${response.status}`);
+            }
+            const data = await response.json();
+            loadingMsg.textContent = data.reply;
+            loadingMsg.classList.remove('loading');
+        } catch (error) {
+            loadingMsg.textContent = `Sorry, there was an error: ${error.message}`;
+            loadingMsg.classList.remove('loading');
+        }
+    }
+    chatSendBtn.addEventListener('click', sendChat);
+    chatInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); sendChat(); } });
+
+    // --- Contact Form ---
+    const sendContactBtn = document.getElementById('sendContact');
+    const contactStatus = document.getElementById('contactStatus');
+
+    sendContactBtn.addEventListener('click', async () => {
+        const payload = {
+            name: document.getElementById('contactName').value,
+            email: document.getElementById('contactEmail').value,
+            message: document.getElementById('contactMessage').value,
+        };
+        if (!payload.name || !payload.email || !payload.message) {
+            contactStatus.textContent = "Please fill out all fields."; return;
+        }
+        contactStatus.textContent = "Sending...";
+        sendContactBtn.disabled = true;
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/contact`, {
+                 method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+             if (!response.ok) throw new Error("Failed to send message.");
+            const data = await response.json();
+            contactStatus.textContent = data.message;
+            ['contactName', 'contactEmail', 'contactMessage'].forEach(id => document.getElementById(id).value = '');
+        } catch (error) {
+            contactStatus.textContent = `Error: ${error.message}`;
+        } finally {
+            sendContactBtn.disabled = false;
+        }
+    });
+    
+    // --- Initial Load ---
+    populateCrops();
+});
+</script>
+
+</body>
+</html>
+
