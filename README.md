@@ -26,7 +26,7 @@ smart-farm-fullstack/
 └── frontend/
     └── index.html                      <-- The user interface
 
-🚀 How to Run This Project
+ How to Run This Project
 Follow these steps in order. All commands should be run from the smart-farm-fullstack/backend/ directory.
 
 Step 1: Set Up the Backend Environment
@@ -56,4 +56,5 @@ uvicorn app:app --reload
 The server will be running at http://127.0.0.1:8000.
 
 Step 5: View the Frontend
+
 Navigate to the frontend/ directory and open the index.html file in your web browser. The dashboard will connect to your running FastAPI server automatically.
