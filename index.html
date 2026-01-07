@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
   
-  <!-- Chart.js for NPK visualization -->
+  <!-- Chart.js (already present) -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
@@ -44,14 +44,22 @@
       position: sticky;
       top: 0;
       z-index: 80;
-      padding: 18px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
+      /* padding: 18px 20px; */ /* REMOVED */
+      /* display: flex; */ /* REMOVED */
+      /* align-items: center; */ /* REMOVED */
+      /* gap: 16px; */ /* REMOVED */
       background: linear-gradient(90deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
       border-bottom: 1px solid var(--glass-border);
       backdrop-filter: blur(8px);
+    }
+    .header-inner { /* NEW */
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      max-width: 1200px; /* Matches .main max-width */
+      margin: 0 auto; /* Centers the content */
+      padding: 18px; /* Matches .main horizontal padding */
+      box-sizing: border-box;
     }
     .brand { display: flex; gap: 12px; align-items: center; }
     .logo {
@@ -62,14 +70,14 @@
       font-weight: 800; color: #012; font-size: 24px;
       transform: rotate(-10deg);
     }
-    h1 { font-size: 18px; margin: 0; color: #fff; }
-    p.subtitle { margin: 0; opacity: 0.9; font-size: 13px; color: var(--muted); }
+    h1 { font-size: 18px; margin: 0; color: #fff; data-lang-key="appTitle" }
+    p.subtitle { margin: 0; opacity: 0.9; font-size: 13px; color: var(--muted); data-lang-key="appSubtitle" }
 
-    nav { display: flex; gap: 8px; align-items: center; }
+    nav { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; /* justify-content: flex-end; */ }
 
     .main {
       display: grid;
-      grid-template-columns: 220px 1fr;
+      grid-template-columns: 160px 1fr; /* REDUCED from 180px */
       gap: 18px;
       max-width: 1200px;
       margin: 20px auto;
@@ -83,12 +91,12 @@
       align-self: start;
       background: var(--glass);
       border-radius: 12px;
-      padding: 14px;
+      padding: 10px; /* REDUCED from 12px */
       border: 1px solid var(--glass-border);
       box-shadow: var(--shadow);
       display: flex;
       flex-direction: column;
-      gap: 10px;
+      gap: 6px; /* REDUCED from 8px */
     }
     .side-section { font-size: 13px; color: var(--muted); margin-bottom: 6px; padding: 0 8px; }
 
@@ -114,7 +122,7 @@
       background: transparent;
       color: var(--muted);
       border: none;
-      padding: 9px 14px;
+      padding: 8px 12px; /* REDUCED from 9px 14px */
       border-radius: 10px;
       cursor: pointer;
       font-weight: 600;
@@ -138,6 +146,13 @@
       box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
     }
     .btn.secondary { background:transparent; color:var(--muted); border:1px solid rgba(255,255,255,0.1); box-shadow:none; }
+    .btn:disabled {
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--muted);
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
 
     label { display: block; font-size: 13px; margin: 12px 0 6px 0; color: #dff7ff; }
     input, select, textarea {
@@ -154,9 +169,36 @@
     }
     input:focus, select:focus, textarea:focus { border-color: var(--accent); }
     
+    /* Hide number input arrows */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] { -moz-appearance: textfield; }
+
+    
     select option {
       background: var(--bg2);
       color: #e9f6ff;
+    }
+    
+    /* Language Selector */
+    .language-selector {
+        /* margin-left: auto; */ /* REMOVED */
+        margin-top: 10px; /* ADDED to create space */
+    }
+    .language-selector select {
+        width: 100%; /* CHANGED from auto */
+        padding: 10px 12px; /* UPDATED to match other inputs */
+        font-size: 13px;
+        font-weight: 600;
+        background: rgba(0,0,0,0.3);
+        /* ADDED to match other selects */
+        border-radius: 10px;
+        border: 1px solid var(--glass-border);
+        color: #fff;
+        box-sizing: border-box;
     }
 
     /* Chat UI */
@@ -170,7 +212,7 @@
     
     .chat-input { display: flex; gap: 8px; }
 
-    /* --- NEW: Floating Chat Styles --- */
+    /* Floating Chat Styles */
     .chat-fab {
       position: fixed;
       bottom: 30px;
@@ -188,11 +230,22 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      transition: transform 0.2s ease;
+      transition: all 0.2s ease;
     }
     .chat-fab:hover {
       transform: scale(1.1);
     }
+    /* Voice Button Style */
+    #voiceAdvisoryBtn {
+        right: 100px; /* Position next to chat button */
+        background: linear-gradient(135deg, #ff7b7b, #ffb270);
+        font-size: 24px;
+    }
+    #voiceAdvisoryBtn.listening {
+        transform: scale(1.1);
+        box-shadow: 0 0 20px 5px #ff7b7b;
+    }
+    
     .chat-modal-container {
       position: fixed;
       inset: 0;
@@ -225,7 +278,7 @@
       align-items: center;
       margin-bottom: 15px;
     }
-    .chat-modal-header h2 { margin: 0; font-size: 16px; }
+    .chat-modal-header h2 { margin: 0; font-size: 16px; data-lang-key="chatTitle" }
     .close-btn {
       background: transparent;
       border: none;
@@ -237,75 +290,275 @@
     }
     .close-btn:hover { color: #fff; }
 
-    /* --- 4. Responsive Design --- */
-    @media (max-width: 980px) {
-      .main { grid-template-columns: 1fr; padding: 0 12px; }
-      .sidebar { position: relative; top: 0; flex-direction: row; overflow-x: auto; height: auto; scrollbar-width: none; }
-      .sidebar::-webkit-scrollbar { display: none; }
-      .side-link { white-space: nowrap; }
-      .header { padding: 12px; }
-      nav { display: none; }
+    /* --- 4. Page Styles --- */
+    /* Grid for Home Page Features */
+    .home-features-grid {
+        display:grid; 
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+        gap: 12px;
     }
-    @media (max-width: 600px) {
-        .dashboard-grid, .home-grid { grid-template-columns: 1fr; }
+    
+    /* Grid for Dashboard Tools */
+    .dashboard-grid {
+        display:grid; 
+        grid-template-columns:1fr 1.2fr 1fr; 
+        gap:12px;
+    }
+    
+    .card-list { display: flex; flex-direction: column; gap: 12px; }
+    .list-item {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        background: rgba(0,0,0,0.1);
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid var(--glass-border);
+    }
+    .list-item-icon {
+        font-size: 24px;
+        flex-shrink: 0;
+    }
+    .list-item-content h3 { margin: 0 0 4px 0; font-size: 15px; color: #fff; }
+    .list-item-content p { margin: 0; font-size: 13px; color: var(--muted); }
+    /* Make news items clickable if they have a link */
+    .list-item a {
+        text-decoration: none;
+        color: inherit;
+        display: contents; /* Make the 'a' tag not affect the layout */
+    }
+    .list-item:hover h3 {
+        color: var(--accent);
+    }
+
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+    th, td {
+        padding: 10px 12px;
+        text-align: left;
+        border-bottom: 1px solid var(--glass-border);
+    }
+    th {
+        font-size: 13px;
+        color: var(--muted);
+        font-weight: 600;
+    }
+    td {
+        font-size: 14px;
+    }
+    
+    /* Styles for Natural Farming Tabs */
+    .tab-btn {
+        background: transparent;
+        border: none;
+        color: var(--muted);
+        padding: 10px 15px;
+        font-weight: 600;
+        cursor: pointer;
+        border-radius: 8px 8px 0 0;
+        border-bottom: 3px solid transparent;
+        transition: all 0.2s ease;
+    }
+    .tab-btn:hover {
+        background: rgba(255, 255, 255, 0.05);
+        color: #fff;
+    }
+    .tab-btn.active {
+        color: #fff;
+        border-bottom: 3px solid var(--accent-2);
+    }
+    .tab-content {
+        display: none; /* Hidden by default */
+        animation: fadeIn 0.3s ease;
+    }
+    .tab-content.active {
+        display: block; /* Shown by JS */
+    }
+    
+    /* Helper class for section titles */
+    .section-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #fff;
+        margin: 25px 0 15px 0;
+        border-bottom: 1px solid var(--glass-border);
+        padding-bottom: 10px;
+    }
+    
+    /* Card for feature links */
+    .feature-card {
+        background: var(--glass);
+        border-radius: var(--card-radius);
+        padding: 18px;
+        box-shadow: var(--shadow);
+        border: 1px solid var(--glass-border);
+        backdrop-filter: blur(8px);
+        display: flex;
+        flex-direction: column;
+    }
+    .feature-card h3 {
+        font-size: 16px;
+        color: #f8fffb;
+        margin: 0 0 8px 0;
+    }
+    .feature-card p {
+        font-size: 13px;
+        color: var(--muted);
+        line-height: 1.5;
+        flex-grow: 1;
+        margin: 0 0 15px 0;
+    }
+
+
+    /* --- 5. Responsive Design --- */
+    /* @media (max-width: 980px) {
+      .main { grid-template-columns: 1fr; padding: 0 12px; }
+      .sidebar { 
+        position: relative; 
+        top: 0; 
+        flex-direction: row; 
+        overflow-x: auto; 
+        height: auto; 
+        scrollbar-width: none; 
+        padding: 14px 10px; 
+      }
+      .sidebar::-webkit-scrollbar { display: none; }
+      .side-link { white-space: nowrap; flex-shrink: 0; }
+      .header { padding: 12px; flex-wrap: wrap; }
+      nav { display: none; } 
+    } */
+    
+    @media (max-width: 768px) {
+        .home-features-grid, .dashboard-grid { grid-template-columns: 1fr; }
         .chat-modal-container { padding: 15px; }
+        .brand h1 { font-size: 16px; }
+        .logo { width: 48px; height: 48px; font-size: 20px; }
+        .header { gap: 10px; }
+        .language-selector {
+            flex-basis: 100%; /* Make language selector take full width on small screens */
+            margin-left: 0;
+            margin-top: 8px;
+        }
+        .language-selector select { width: 100%; }
     }
   </style>
 </head>
 <body>
 
   <div class="header">
-    <div class="brand">
-      <div class="logo">AT</div>
-      <div>
-        <h1>Agri Tech</h1>
-        <p class="subtitle">AI-Powered Agricultural Insights</p>
+    <div class="header-inner"> <!-- NEW WRAPPER -->
+      <div class="brand">
+        <div class="logo">AT</div>
+        <div>
+          <h1 data-lang-key="appTitle">Agri Tech</h1>
+          <p class="subtitle" data-lang-key="appSubtitle">AI-Powered Agricultural Insights</p>
+        </div>
       </div>
-    </div>
-    <nav>
-      <button class="nav-btn active" data-target="homePage">Home</button>
-      <button class="nav-btn" data-target="dashPage">Dashboards</button>
-      <button class="nav-btn" data-target="aboutPage">About</button>
-      <button class="nav-btn" data-target="contactPage">Contact</button>
+      
+      <!-- Desktop Nav (hidden on mobile) -->
+      <nav>
+      <button class="nav-btn active" data-target="homePage" data-lang-key="navHome">Home</button>
+      <!-- RESTORED Dashboard Link -->
+      <button class="nav-btn" data-target="dashPage" data-lang-key="navDash">Dashboards</button>
+      <button class="nav-btn" data-target="aboutPage" data-lang-key="navAbout">About</button>
+      <button class="nav-btn" data-target="marketPage" data-lang-key="navMarket">Market Prices</button>
+      <button class="nav-btn" data-target="newsPage" data-lang-key="navNews">News</button>
+      <button class="nav-btn" data-target="schemesPage" data-lang-key="navSchemes">Schemes</button>
+      <button class="nav-btn" data-target="fertilizerPage" data-lang-key="navLabs">Fertilizer Labs</button>
+      <button class="nav-btn" data-target="naturalFarmingPage" data-lang-key="navFarming">Natural Farming</button>
+      <!-- <button class="nav-btn" data-target="contactPage" data-lang-key="navContact">Contact</button> --> <!-- REMOVED -->
     </nav>
-  </div>
+    
+    <!-- Language Selector -->
+    <!-- MOVED TO SIDEBAR -->
+    
+  </div> <!-- END OF NEW WRAPPER -->
+</div>
 
   <div class="main">
+    <!-- Sidebar (for mobile/tablet) -->
     <aside class="sidebar" aria-label="Sidebar">
-      <div class="side-link active" data-target="homePage"> Home</div>
-      <div class="side-link" data-target="dashPage"> Dashboards</div>
-      <div class="side-link" data-target="aboutPage"> About</div>
-      <div class="side-link" data-target="contactPage"> Contact</div>
+      <div class="side-link active" data-target="homePage" data-lang-key="navHome">Home</div>
+      <!-- RESTORED Dashboard Link -->
+      <div class="side-link" data-target="dashPage" data-lang-key="navDash">Dashboards</div>
+      <div class="side-link" data-target="aboutPage" data-lang-key="navAbout">About</div>
+      <div class="side-link" data-target="marketPage" data-lang-key="navMarket">Market Prices</div>
+      <div class="side-link" data-target="newsPage" data-lang-key="navNews">News</div>
+      <div class="side-link" data-target="schemesPage" data-lang-key="navSchemes">Schemes</div>
+      <div class="side-link" data-target="fertilizerPage" data-lang-key="navLabs">Fertilizer Labs</div>
+      <div class="side-link" data-target="naturalFarmingPage" data-lang-key="navFarming">Natural Farming</div>
+      <div class="side-link" data-target="contactPage" data-lang-key="navContact">Contact</div>
+      
+      <!-- Language Selector MOVED HERE -->
+      <div class="language-selector">
+        <select id="langSwitch">
+          <option value="en">English</option>
+          <option value="hi"> हिंदी (Hindi)</option>
+          <option value="te">తెలుగు (Telugu)</option>
+        </select>
+      </div>
     </aside>
 
     <main class="content">
+    
+      <!-- PAGE 1: Home (Simple Welcome Page) -->
       <section id="homePage" class="page active">
         <div class="card">
-          <h2>Welcome, Farmer! 👋</h2>
-          <p class="muted">Your AI-powered assistant for modern farming in Andhra Pradesh. Access weather forecasts, get crop recommendations based on soil data, find the right pesticide, or chat with our AI for expert advice by clicking the chat icon in the corner.</p>
+          <h2 data-lang-key="homeWelcomeTitle">Welcome, Farmer! 👋</h2>
+          <p class="muted" data-lang-key="homeWelcomeMsg">Your AI-powered assistant for modern farming. Use the main tools on our Dashboard, or explore our other services for live market prices, news, and more.</p>
         </div>
-        <div class="home-grid" style="display:grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
-            <div class="card">
-                <h3>🌤️ Local Weather</h3>
-                <p class="muted">Get a quick weather check for your location. The climate data will auto-fill the crop recommendation form.</p>
-                <button class="btn" data-target="dashPage">Go to Weather Dashboard</button>
+        
+        <!-- RESTORED: Features Overview Section -->
+        <h2 class="section-title" data-lang-key="homeExploreTitle">Explore Our Services</h2>
+        <div class="home-features-grid">
+            <div class="feature-card">
+                <h3 data-lang-key="homeToolsTitle">🌤️ Farming Tools</h3>
+                <p data-lang-key="homeToolsDesc">Access weather, crop, and pesticide recommendations all in one place.</p>
+                <button class="btn secondary" data-target="dashPage" data-lang-key="homeToolsBtn">Go to Dashboards</button>
             </div>
-            <div class="card">
-                <h3>🌱 Crop Predictions</h3>
-                <p class="muted">Input your soil's NPK values and local climate data to get an instant crop recommendation from our ML model.</p>
-                <button class="btn" data-target="dashPage">Go to Crop Dashboard</button>
+            <div class="feature-card">
+                <h3 data-lang-key="homeMarketTitle">🌾 Market Prices</h3>
+                <p data-lang-key="homeMarketDesc">Get live market price updates to sell your crops at the best rate.</p>
+                <button class="btn secondary" data-target="marketPage" data-lang-key="homeMarketBtn">Check Prices</button>
+            </div>
+            <div class="feature-card">
+                <h3 data-lang-key="homeNewsTitle">📰 Agriculture News</h3>
+                <p data-lang-key="homeNewsDesc">Stay updated with the latest farming news, techniques, and alerts.</p>
+                <button class="btn secondary" data-target="newsPage" data-lang-key="homeNewsBtn">View News</button>
+            </div>
+            <div class="feature-card">
+                <h3 data-lang-key="homeSchemesTitle">🏛️ Government Schemes</h3>
+                <p data-lang-key="homeSchemesDesc">Discover and learn about beneficial government schemes and subsidies.</p>
+                <button class="btn secondary" data-target="schemesPage" data-lang-key="homeSchemesBtn">View Schemes</button>
+            </div>
+             <div class="feature-card">
+                <h3 data-lang-key="homeLabsTitle">🔬 Soil Testing Labs</h3>
+                <p data-lang-key="homeLabsDesc">Find the nearest soil and fertilizer testing labs in your area using a pincode.</p>
+                <button class="btn secondary" data-target="fertilizerPage" data-lang-key="homeLabsBtn">Find Labs</button>
+            </div>
+             <div class="feature-card">
+                <h3 data-lang-key="homeFarmingTitle">🌿 Natural Farming</h3>
+                <p data-lang-key="homeFarmingDesc">Learn about the principles and benefits of Zero Budget Natural Farming.</p>
+                <button class="btn secondary" data-target="naturalFarmingPage" data-lang-key="homeFarmingBtn">Learn More</button>
             </div>
         </div>
+        
       </section>
-
+      
+      <!-- PAGE 2: Dashboards (RESTORED) -->
       <section id="dashPage" class="page">
-        <div class="dashboard-grid" style="display:grid; grid-template-columns:1fr 1.2fr 1fr; gap:12px">
+        <!-- Dashboard Tools MOVED back here -->
+        <div class="dashboard-grid">
           <div class="card" id="weatherCard">
-            <h2>🌤️ Weather</h2>
-            <div class="muted">Enter a location to auto-fill climate data below.</div>
-            <label for="weatherLocation">Location</label>
+            <h2 data-lang-key="weatherTitle">🌤️ Weather</h2>
+            <div class="muted" data-lang-key="weatherDesc">Enter a location to auto-fill climate data below.</div>
+            <label for="weatherLocation" data-lang-key="weatherLabelLocation">Location</label>
             <input id="weatherLocation" type="text" value="Anantapur" placeholder="e.g., Sircilla,IN" />
-            <button class="btn primary" id="getWeatherBtn" style="margin-top:10px; width: 100%;">Get Weather</button>
+            <button class="btn primary" id="getWeatherBtn" style="margin-top:10px; width: 100%;" data-lang-key="weatherButton">Get Weather</button>
             <div id="weatherResult" style="margin-top:12px; display:none;">
               <div class="small" id="weatherCity"></div>
               <div style="font-size: 28px; font-weight: 700; margin: 4px 0;" id="weatherTemp"></div>
@@ -316,76 +569,331 @@
           </div>
 
           <div class="card" id="cropCard">
-            <h2>🌱 Crop Recommendation</h2>
-            <div class="muted">Enter soil & climate data to get a suggestion.</div>
+            <h2 data-lang-key="cropTitle">🌱 Crop Recommendation</h2>
+            <div class="muted" data-lang-key="cropDesc">Enter soil & climate data to get a suggestion.</div>
             <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 8px;">
-                <div><label>Nitrogen (N) <span class="muted">(0-140)</span></label><input id="nutN" type="number" value="90" /></div>
-                <div><label>Phosphorus (P) <span class="muted">(5-145)</span></label><input id="nutP" type="number" value="42" /></div>
-                <div><label>Potassium (K) <span class="muted">(5-205)</span></label><input id="nutK" type="number" value="43" /></div>
-                <div><label>Temp (°C) <span class="muted">(8-44)</span></label><input id="temp" type="number" value="21" step="0.1"/></div>
-                <div><label>Humidity (%) <span class="muted">(14-100)</span></label><input id="humidity" type="number" value="82" step="0.1"/></div>
-                <div><label>pH <span class="muted">(3.5-9.9)</span></label><input id="ph" type="number" value="6.5" step="0.1"/></div>
-                <div style="grid-column: span 3;"><label>Rainfall (mm) <span class="muted">(20-299)</span></label><input id="rain" type="number" value="203" step="1"/></div>
+                <div><label data-lang-key="cropLabelN">Nitrogen (N) <span class="muted">(0-140)</span></label><input id="nutN" type="number" value="90" /></div>
+                <div><label data-lang-key="cropLabelP">Phosphorus (P) <span class="muted">(5-145)</span></label><input id="nutP" type="number" value="42" /></div>
+                <div><label data-lang-key="cropLabelK">Potassium (K) <span class="muted">(5-205)</span></label><input id="nutK" type="number" value="43" /></div>
+                <div><label data-lang-key="cropLabelTemp">Temp (°C) <span class="muted">(8-44)</span></label><input id="temp" type="number" value="21" step="0.1"/></div>
+                <div><label data-lang-key="cropLabelHumidity">Humidity (%) <span class="muted">(14-100)</span></label><input id="humidity" type="number" value="82" step="0.1"/></div>
+                <div><label data-lang-key="cropLabelPh">pH <span class="muted">(3.5-9.9)</span></label><input id="ph" type="number" value="6.5" step="0.1"/></div>
+                <div style="grid-column: span 3;"><label data-lang-key="cropLabelRain">Rainfall (mm) <span class="muted">(20-299)</span></label><input id="rain" type="number" value="203" step="1"/></div>
             </div>
-            <button class="btn primary" id="recommendBtn" style="margin-top:12px; width: 100%;">Recommend Crop</button>
+            <button class="btn primary" id="recommendBtn" style="margin-top:12px; width: 100%;" data-lang-key="cropButton">Recommend Crop</button>
             <div style="margin-top:14px;">
-              <div class="muted">Prediction Result</div>
-              <div id="recChip" class="chip" style="font-size: 16px; padding: 8px 14px; margin-top: 8px;">No prediction yet</div>
+              <div class="muted" data-lang-key="cropLabelResult">Prediction Result</div>
+              <div id="recChip" class="chip" style="font-size: 16px; padding: 8px 14px; margin-top: 8px;" data-lang-key="cropResultDefault">No prediction yet</div>
             </div>
           </div>
           
           <div class="card" id="pestCard">
-            <h2>🧴 Pesticide Recommendation</h2>
-            <div class="muted">Select your crop and the identified pest.</div>
-            <label>Crop</label><select id="cropSelect"><option>Loading crops...</option></select>
-            <label>Pest</label><select id="pestSelect"><option>Select a crop first...</option></select>
-            <button class="btn primary" id="getPestBtn" style="margin-top:12px; width: 100%;">Get Pesticide</button>
+            <h2 data-lang-key="pestTitle">🧴 Pesticide Recommendation</h2>
+            <div class="muted" data-lang-key="pestDesc">Select your crop and the identified pest.</div>
+            <label data-lang-key="pestLabelCrop">Crop</label><select id="cropSelect"><option data-lang-key="pestLoadingCrop">Loading crops...</option></select>
+            <label data-lang-key="pestLabelPest">Pest</label><select id="pestSelect"><option data-lang-key="pestSelectCropFirst">Select a crop first...</option></select>
+            <button class="btn primary" id="getPestBtn" style="margin-top:12px; width: 100%;" data-lang-key="pestButton">Get Pesticide</button>
             <div style="margin-top:12px;">
-              <div class="muted">Recommended Pesticide</div>
+              <div class="muted" data-lang-key="pestLabelResult">Recommended Pesticide</div>
               <div id="pesticideResult" style="margin-top:8px;font-weight:700; color: var(--accent-2)">—</div>
             </div>
           </div>
         </div>
       </section>
 
+      <!-- PAGE 3: About -->
       <section id="aboutPage" class="page">
         <div class="card">
-          <h2>About Smart Farmer assistant</h2>
-          <p class="muted">This project is a comprehensive, AI-powered tool designed to assist farmers in Andhra Pradesh with data-driven decision-making. It leverages a machine learning model for crop recommendations and integrates with powerful APIs for real-time weather data and expert-level agricultural advice through an AI chatbot.</p>
+          <h2 data-lang-key="aboutTitle">About Smart Farmer Assistant</h2>
+          <p class="muted" data-lang-key="aboutDesc">This project is a comprehensive, AI-powered tool designed to assist farmers in Andhra Pradesh with data-driven decision-making. It leverages a machine learning model for crop recommendations and integrates with powerful APIs for real-time weather data and expert-level agricultural advice through an AI chatbot.</p>
         </div>
       </section>
 
+      <!-- PAGE 4: Market Prices (Live API) -->
+      <section id="marketPage" class="page">
+        <div class="card">
+          <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+            <h2 data-lang-key="marketTitle" style="margin: 0;">🌾 Market Price Updates</h2>
+            <button id="refreshMarketBtn" class="btn secondary" data-lang-key="marketRefreshBtn">Refresh</button>
+          </div>
+          <p class="muted" data-lang-key="marketDesc">Select your market and refresh to get live prices.</p>
+          <label for="marketSelect" data-lang-key="marketLabelSelect">Select Market Yard</label>
+          <select id="marketSelect">
+              <option value="Anantapur" data-lang-key="marketAnantapur">Anantapur</option>
+              <option value="Guntur" data-lang-key="marketGuntur">Guntur</option>
+              <option value="Kadapa" data-lang-key="marketKadapa">Kadapa</option>
+          </select>
+          <div id="marketLoading" class="muted" style="display: none; margin-top: 15px;" data-lang-key="marketLoading">Fetching live prices...</div>
+          <table>
+              <thead>
+                  <tr>
+                      <th data-lang-key="marketHeaderCrop">Crop</th>
+                      <th data-lang-key="marketHeaderVariety">Variety</th>
+                      <th data-lang-key="marketHeaderPrice">Price (per Quintal)</th>
+                  </tr>
+              </thead>
+              <tbody id="market-table-body">
+                  <!-- FALLBACK MOCK DATA -->
+                  <tr>
+                      <td data-lang-key="marketCropPaddy">Paddy</td>
+                      <td data-lang-key="marketVarietyCommon">Common</td>
+                      <td>₹1,900 - ₹2,100</td>
+                  </tr>
+                  <tr>
+                      <td data-lang-key="marketCropCotton">Cotton</td>
+                      <td data-lang-key="marketVarietyLong">Long Staple</td>
+                      <td>₹6,800 - ₹7,200</td>
+                  </tr>
+                  <tr>
+                      <td data-lang-key="marketCropChilli">Red Chilli</td>
+                      <td data-lang-key="marketVarietyTeja">Teja</td>
+                      <td>₹18,000 - ₹22,000</td>
+                  </tr>
+                   <tr>
+                      <td data-lang-key="marketCropGroundnut">Groundnut</td>
+                      <td data-lang-key="marketVarietyK6">K6</td>
+                      <td>₹6,500 - ₹7,000</td>
+                  </tr>
+              </tbody>
+          </table>
+        </div>
+      </section>
+      
+      <!-- PAGE 5: News (Live API) -->
+      <section id="newsPage" class="page">
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; gap: 15px;">
+                 <h2 data-lang-key="newsTitle" style="margin: 0;">📰 Agriculture News</h2>
+                 <button id="refreshNewsBtn" class="btn secondary" data-lang-key="newsRefreshBtn">Refresh</button>
+            </div>
+            <p class="muted" data-lang-key="newsDesc">Live agricultural updates, powered by Gemini.</p>
+            <div id="newsLoading" class="muted" style="display: none; margin-top: 15px;" data-lang-key="newsLoading">Fetching latest news...</div>
+            <div id="news-list" class="card-list" style="margin-top: 15px;">
+                <!-- FALLBACK MOCK DATA -->
+                <div class="list-item">
+                    <div class="list-item-icon">🌦️</div>
+                    <div class="list-item-content">
+                        <h3 data-lang-key="news1Title">Monsoon forecast updated for Rayalaseema</h3>
+                        <p data-lang-key="news1Desc">IMD predicts normal rainfall for the upcoming Kharif season...</p>
+                    </div>
+                </div>
+                 <div class="list-item">
+                    <div class="list-item-icon">💰</div>
+                    <div class="list-item-content">
+                        <h3 data-lang-key="news2Title">MSP for Paddy increased by 5%</h3>
+                        <p data-lang-key="news2Desc">The central government announced the new Minimum Support Price...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </section>
+      
+      <!-- PAGE 6: Schemes -->
+      <section id="schemesPage" class="page">
+        <div class="card">
+            <h2 data-lang-key="schemesTitle">🏛️ Government Schemes</h2>
+            <div class="muted" data-lang-key="schemesDesc">Find assistance and support programs available. Click an item to visit the official site.</div>
+            
+            <!-- NEW: Tab Headers for Schemes -->
+            <div class="tabs" style="display: flex; gap: 5px; border-bottom: 1px solid var(--glass-border); margin-bottom: 15px; margin-top: 15px;">
+                <button class="tab-btn active" data-tab="state-schemes" data-lang-key="schemesTabState">State Schemes</button>
+                <button class="tab-btn" data-tab="central-schemes" data-lang-key="schemesTabCentral">Central Schemes</button>
+                <button class="tab-btn" data-tab="private-schemes" data-lang-key="schemesTabPrivate">Private / NGO</button>
+            </div>
+
+             <!-- NEW: Tab Content Panes -->
+             <div id="state-schemes" class="tab-content active">
+                <div class="card-list">
+                    <div class="list-item">
+                        <a href="https://ysrrythubharosa.ap.gov.in/" target="_blank" rel="noopener noreferrer">
+                        <div class="list-item-icon">🌾</div>
+                        <div class="list-item-content">
+                            <h3 data-lang-key="scheme1Title">YSR Rythu Bharosa</h3>
+                            <p data-lang-key="scheme1Desc">Financial assistance of ₹13,500 per year to farmer families. Click to visit.</p>
+                        </div>
+                        </a>
+                    </div>
+                    <div class="list-item"> <!-- ADDED new state scheme -->
+                        <a href="https://ysr-pbm.ap.gov.in/" target="_blank" rel="noopener noreferrer">
+                        <div class="list-item-icon">☀️</div>
+                        <div class="list-item-content">
+                            <h3 data-lang-key="schemeState2Title">YSR Free Agriculture Power</h3>
+                            <p data-lang-key="schemeState2Desc">Providing 9 hours of free power supply for agriculture. Click to visit.</p>
+                        </div>
+                        </a>
+                    </div>
+                </div>
+             </div>
+             
+             <div id="central-schemes" class="tab-content">
+                <div class="card-list">
+                    <div class="list-item">
+                        <a href="https://pmfby.gov.in/" target="_blank" rel="noopener noreferrer">
+                        <div class="list-item-icon">☂️</div>
+                        <div class="list-item-content">
+                            <h3 data-lang-key="scheme2Title">Pradhan Mantri Fasal Bima Yojana (PMFBY)</h3>
+                            <p data-lang-key="scheme2Desc">Insurance coverage and financial support in case of crop failure. Click to visit.</p>
+                        </div>
+                        </a>
+                    </div>
+                    <div class="list-item">
+                        <a href="https://pmksy.gov.in/" target="_blank" rel="noopener noreferrer">
+                        <div class="list-item-icon">💧</div>
+                        <div class="list-item-content">
+                            <h3 data-lang-key="scheme3Title">Per Drop More Crop (Micro-irrigation)</h3>
+                            <p data-lang-key="scheme3Desc">Subsidies available for installing drip and sprinkler irrigation systems. Click to visit.</p>
+                        </div>
+                        </a>
+                    </div>
+                </div>
+             </div>
+             
+             <div id="private-schemes" class="tab-content">
+                <div class="card-list">
+                    <div class="list-item"> <!-- ADDED new private org example -->
+                        <a href="https://www.reliancefoundation.org/our-work/rural-development" target="_blank" rel="noopener noreferrer">
+                        <div class="list-item-icon">🤝</div>
+                        <div class="list-item-content">
+                            <h3 data-lang-key="schemePrivate1Title">Reliance Foundation</h3>
+                            <p data-lang-key="schemePrivate1Desc">Providing digital advisories and support to farmers. Click to learn more.</p>
+                        </div>
+                        </a>
+                    </div>
+                </div>
+             </div>
+             
+        </div>
+      </section>
+      
+      <!-- PAGE 7: Fertilizer Labs -->
+      <section id="fertilizerPage" class="page">
+        <div class="card">
+            <h2 data-lang-key="labsTitle">🔬 Fertilizer & Soil Testing Labs</h2>
+            <div class="muted" data-lang-key="labsDesc">Enter your 6-digit pincode to find nearby labs.</div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 15px;">
+                <input id="pincodeInput" type="number" data-lang-placeholder="labsPincodePlaceholder" placeholder="Enter Pincode" style="flex: 1;" />
+                <button id="findLabsBtn" class="btn primary" data-lang-key="labsButton">Search</button>
+            </div>
+            
+            <div id="labResults" class="card-list" style="margin-top: 20px;">
+                <!-- Results will be injected here by JS -->
+                <p class="muted" data-lang-key="labsResultsDefault">Please enter a pincode to see results.</p>
+            </div>
+        </div>
+      </section>
+      
+      <!-- PAGE 8: Natural Farming -->
+      <section id="naturalFarmingPage" class="page">
+        <div class="card">
+            <h2 data-lang-key="farmingTitle">🌿 Natural Farming</h2>
+            
+            <!-- Tab Headers -->
+            <div class="tabs" style="display: flex; gap: 5px; border-bottom: 1px solid var(--glass-border); margin-bottom: 15px;">
+                <button class="tab-btn active" data-tab="farming-intro" data-lang-key="farmingTabIntro">Introduction</button>
+                <button class="tab-btn" data-tab="farming-pillars" data-lang-key="farmingTabPillars">Key Pillars</button>
+                <button class="tab-btn" data-tab="farming-updates" data-lang-key="farmingTabUpdates">Latest Updates</button>
+                <button class="tab-btn" data-tab="farming-reading" data-lang-key="farmingTabReading">Reading Material</button> <!-- ADDED -->
+            </div>
+
+            <!-- Tab Content -->
+            <div id="farming-intro" class="tab-content active">
+                <p class="muted" style="line-height: 1.6;" data-lang-key="farmingDesc1">
+                    Zero Budget Natural Farming (ZBNF), or Community Managed Natural Farming (CMNF) as it's known in Andhra Pradesh, is a form of agriculture that avoids all chemical fertilizers and pesticides. It relies on natural inputs that are prepared by the farmer using locally available resources like cow dung, cow urine, jaggery, and pulse flour. It aims to make farming economically viable and climate-resilient.
+                </p>
+            </div>
+            <div id="farming-pillars" class="tab-content">
+                 <h3 style="margin-top: 10px; font-size: 15px;" data-lang-key="farmingSubTitle">Key Pillars:</h3>
+                 <ul class="muted" style="line-height: 1.6; margin-left: 20px;">
+                    <li data-lang-key="farmingPillar1"><b>Jeevamrutham:</b> A microbial culture made from cow dung, urine, jaggery, and water to improve soil fertility.</li>
+                    <li data-lang-key="farmingPillar2"><b>Beejamrutham:</b> A seed treatment to protect seeds from soil-borne diseases.</li>
+                    <li data-lang-key="farmingPillar3"><b>Acchadana (Mulching):</b> Covering the soil with crop residues to retain moisture and build humus.</li>
+                    <li data-lang-key="farmingPillar4"><b>Waaphasa (Soil Aeration):</b> Maintaining a balance of air and water in the soil.</li>
+                 </ul>
+            </div>
+            <div id="farming-updates" class="tab-content">
+                <h3 style="margin-top: 10px; font-size: 15px;" data-lang-key="farmingUpdatesTitle">Latest Updates</h3>
+                <div class="card-list" style="margin-top: 10px; background: transparent; padding: 0; box-shadow: none; border: none;">
+                    <div class="list-item">
+                         <div class="list-item-icon">🗓️</div>
+                         <div class="list-item-content">
+                            <h3 data-lang-key="farmingUpdate1Title">Workshop on Jeevamrutham preparation in Guntur</h3>
+                            <p data-lang-key="farmingUpdate1Desc">A state-level workshop will be held on 15th Dec at ANGRAU.</p>
+                         </div>
+                    </div>
+                    <div class="list-item">
+                         <div class="list-item-icon">🌱</div>
+                         <div class="list-item-content">
+                            <h3 data-lang-key="farmingUpdate2Title">Govt. to provide subsidy for Natural Farming inputs</h3>
+                            <p data-lang-key="farmingUpdate2Desc">A new scheme is announced to support farmers shifting to ZBNF.</p>
+                         </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- NEW TAB CONTENT -->
+            <div id="farming-reading" class="tab-content">
+                <h3 style="margin-top: 10px; font-size: 15px;" data-lang-key="farmingReadingTitle">Guides & Books</h3>
+                <div class="card-list" style="margin-top: 10px; background: transparent; padding: 0; box-shadow: none; border: none;">
+                    <div class="list-item">
+                         <a href="https://en.wikipedia.org/wiki/The_One-Straw_Revolution" target="_blank" rel="noopener noreferrer"> <!-- ADDED LINK -->
+                         <div class="list-item-icon">📖</div>
+                         <div class="list-item-content">
+                            <h3 data-lang-key="farmingBook1Title">'One-Straw Revolution' by Masanobu Fukuoka</h3>
+                            <p data-lang-key="farmingBook1Desc">A foundational text on natural farming principles. (External Link - Mock)</p>
+                         </div>
+                         </a> <!-- ADDED LINK -->
+                    </div>
+                    <div class="list-item">
+                         <a href="https://apzbnf.in/wp-content/uploads/2018/06/A-to-Z-ZBNF-BOOK.pdf" target="_blank" rel="noopener noreferrer"> <!-- ADDED LINK -->
+                         <div class="list-item-icon">📗</div>
+                         <div class="list-item-content">
+                            <h3 data-lang-key="farmingBook2Title">ZBNF Community Manual (AP Govt.)</h3>
+                            <p data-lang-key="farmingBook2Desc">Official guide for Community Managed Natural Farming. (PDF - Mock)</p>
+                         </div>
+                         </a> <!-- ADDED LINK -->
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+      </section>
+
+      <!-- PAGE 9: Contact -->
       <section id="contactPage" class="page">
         <div class="card">
-          <h2>Contact Us</h2>
-          <div class="muted">Questions or support? Send a message.</div>
-          <label>Your Name</label><input id="contactName" type="text" placeholder="Full name" />
-          <label>Your Email</label><input id="contactEmail" type="email" placeholder="name@example.com" />
-          <label>Message</label><textarea id="contactMessage" rows="5" placeholder="How can we help?"></textarea>
-          <button class="btn primary" id="sendContact" style="margin-top:12px;">Send Message</button>
+          <h2 data-lang-key="contactTitle">Contact Us</h2>
+          <div class="muted" data-lang-key="contactDesc">Questions or support? Send a message.</div>
+          <label data-lang-key="contactLabelName">Your Name</label><input id="contactName" type="text" data-lang-placeholder="contactPlaceholderName" placeholder="Full name" />
+          <label data-lang-key="contactLabelEmail">Your Email</label><input id="contactEmail" type="email" data-lang-placeholder="contactPlaceholderEmail" placeholder="name@example.com" />
+          <label data-lang-key="contactLabelMsg">Message</label><textarea id="contactMessage" rows="5" data-lang-placeholder="contactPlaceholderMsg" placeholder="How can we help?"></textarea>
+          <button class="btn primary" id="sendContact" style="margin-top:12px;" data-lang-key="contactButton">Send Message</button>
           <div class="muted" id="contactStatus" style="margin-top:10px"></div>
         </div>
       </section>
     </main>
   </div>
 
-  <!-- NEW: Floating Action Button for Chat -->
+  <!-- Voice Advisory Button -->
+  <button id="voiceAdvisoryBtn" class="chat-fab" aria-label="Voice Advisory">🎤</button>
+  
+  <!-- Floating Action Button for Chat -->
   <button id="openChatBtn" class="chat-fab" aria-label="Open Chat">💬</button>
 
-  <!-- NEW: Chat Modal -->
+  <!-- Chat Modal -->
   <div id="chatModal" class="chat-modal-container">
     <div class="chat-modal">
         <div class="chat-modal-header">
-            <h2>AI Farm Assistant</h2>
+            <h2 data-lang-key="chatTitle">AI Farm Assistant</h2>
             <button id="closeChatBtn" class="close-btn" aria-label="Close Chat">&times;</button>
         </div>
         <div class="chat">
             <div class="messages" id="chatMessages">
-                <div class="msg bot">Hello! I'm your AI Farm Assistant. Ask me anything about farming in Andhra Pradesh.</div>
+                <div class="msg bot" data-lang-key="chatWelcome">Hello! I'm your AI Farm Assistant. Ask me anything about farming in Andhra Pradesh.</div>
             </div>
             <div class="chat-input">
-                <input id="chatInput" type="text" placeholder="Ask about crops, pests..." />
-                <button class="btn primary" id="chatSend">Send</button>
+                <input id="chatInput" type="text" data-lang-placeholder="chatPlaceholder" placeholder="Ask about crops, pests..." />
+                <button class="btn primary" id="chatSend" data-lang-key="chatSendButton">Send</button>
             </div>
         </div>
     </div>
@@ -395,20 +903,615 @@
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-    const API_BASE_URL = "http://127.0.0.1:8000";
+    // --- Language Translation Engine ---
+    const translations = {
+        en: {
+            appTitle: "Agri Tech",
+            appSubtitle: "AI-Powered Agricultural Insights",
+            navHome: "Home",
+            navDash: "Dashboards", // RESTORED
+            navAbout: "About",
+            navMarket: "Market Prices",
+            navNews: "News",
+            navSchemes: "Schemes",
+            navLabs: "Fertilizer Labs",
+            navFarming: "Natural Farming",
+            navContact: "Contact",
+            // Home Page (Updated)
+            homeWelcomeTitle: "Welcome, Farmer! 👋",
+            homeWelcomeMsg: "Your AI-powered assistant for modern farming. Use the main tools on our Dashboard, or explore our other services for live market prices, news, and more.",
+            homeExploreTitle: "Explore Our Services",
+            homeToolsTitle: "🌤️ Farming Tools",
+            homeToolsDesc: "Access weather, crop, and pesticide recommendations all in one place.",
+            homeToolsBtn: "Go to Dashboards",
+            homeMarketTitle: "🌾 Market Prices",
+            homeMarketDesc: "Get live market price updates to sell your crops at the best rate.",
+            homeMarketBtn: "Check Prices",
+            homeNewsTitle: "📰 Agriculture News",
+            homeNewsDesc: "Stay updated with the latest farming news, techniques, and alerts.",
+            homeNewsBtn: "View News",
+            homeSchemesTitle: "🏛️ Government Schemes",
+            homeSchemesDesc: "Discover and learn about beneficial government schemes and subsidies.",
+            homeSchemesBtn: "View Schemes",
+            homeLabsTitle: "🔬 Soil Testing Labs",
+            homeLabsDesc: "Find the nearest soil and fertilizer testing labs in your area using a pincode.",
+            homeLabsBtn: "Find Labs",
+            homeFarmingTitle: "🌿 Natural Farming",
+            homeFarmingDesc: "Learn about the principles and benefits of Zero Budget Natural Farming.",
+            homeFarmingBtn: "Learn More",
+            // Dashboard Tools (on Dashboard page)
+            weatherTitle: "🌤️ Weather",
+            weatherDesc: "Enter a location to auto-fill climate data below.",
+            weatherLabelLocation: "Location",
+            weatherButton: "Get Weather",
+            cropTitle: "🌱 Crop Recommendation",
+            cropDesc: "Enter soil & climate data to get a suggestion.",
+            cropLabelN: "Nitrogen (N)",
+            cropLabelP: "Phosphorus (P)",
+            cropLabelK: "Potassium (K)",
+            cropLabelTemp: "Temp (°C)",
+            cropLabelHumidity: "Humidity (%)",
+            cropLabelPh: "pH",
+            cropLabelRain: "Rainfall (mm)",
+            cropButton: "Recommend Crop",
+            cropLabelResult: "Prediction Result",
+            cropResultDefault: "No prediction yet",
+            pestTitle: "🧴 Pesticide Recommendation",
+            pestDesc: "Select your crop and the identified pest.",
+            pestLabelCrop: "Crop",
+            pestLoadingCrop: "Loading crops...",
+            pestLabelPest: "Pest",
+            pestSelectCropFirst: "Select a crop first...",
+            pestButton: "Get Pesticide",
+            pestLabelResult: "Recommended Pesticide",
+            // About Page
+            aboutTitle: "About Smart Farmer Assistant",
+            aboutDesc: "This project is a comprehensive, AI-powered tool designed to assist farmers in Andhra Pradesh with data-driven decision-making. It leverages a machine learning model for crop recommendations and integrates with powerful APIs for real-time weather data and expert-level agricultural advice through an AI chatbot.",
+            // Market Page
+            marketTitle: "🌾 Market Price Updates",
+            marketRefreshBtn: "Refresh",
+            marketDesc: "Select your market and refresh to get live prices.",
+            marketLabelSelect: "Select Market Yard",
+            marketAnantapur: "Anantapur",
+            marketGuntur: "Guntur",
+            marketKadapa: "Kadapa",
+            marketLoading: "Fetching live prices from Google...",
+            marketHeaderCrop: "Crop",
+            marketHeaderVariety: "Variety",
+            marketHeaderPrice: "Price (per Quintal)",
+            marketCropPaddy: "Paddy",
+            marketVarietyCommon: "Common",
+            marketCropCotton: "Cotton",
+            marketVarietyLong: "Long Staple",
+            marketCropChilli: "Red Chilli",
+            marketVarietyTeja: "Teja",
+            marketCropGroundnut: "Groundnut",
+            marketVarietyK6: "K6",
+            // News Page
+            newsTitle: "📰 Agriculture News",
+            newsRefreshBtn: "Refresh",
+            newsDesc: "Live agricultural updates, powered by Gemini.",
+            newsLoading: "Fetching latest news from Gemini...",
+            news1Title: "Monsoon forecast updated for Rayalaseema",
+            news1Desc: "IMD predicts normal rainfall for the upcoming Kharif season...",
+            news2Title: "MSP for Paddy increased by 5%",
+            news2Desc: "The central government announced the new Minimum Support Price...",
+            // Schemes Page
+            schemesTitle: "🏛️ Government Schemes",
+            schemesDesc: "Find assistance and support programs available. Click an item to visit the official site.", // UPDATED
+            // ADDED Scheme Tab Keys
+            schemesTabState: "State Schemes",
+            schemesTabCentral: "Central Schemes",
+            schemesTabPrivate: "Private / NGO",
+            
+            scheme1Title: "YSR Rythu Bharosa",
+            scheme1Desc: "Financial assistance of ₹13,500 per year to farmer families. Click to visit.", // UPDATED
+            scheme2Title: "Pradhan Mantri Fasal Bima Yojana (PMFBY)",
+            scheme2Desc: "Insurance coverage and financial support in case of crop failure. Click to visit.", // UPDATED
+            scheme3Title: "Per Drop More Crop (Micro-irrigation)",
+            scheme3Desc: "Subsidies available for installing drip and sprinkler irrigation systems. Click to visit.", // UPDATED
+            
+            // ADDED New Scheme Keys
+            schemeState2Title: "YSR Free Agriculture Power",
+            schemeState2Desc: "Providing 9 hours of free power supply for agriculture. Click to visit.",
+            schemePrivate1Title: "Reliance Foundation",
+            schemePrivate1Desc: "Providing digital advisories and support to farmers. Click to learn more.",
 
-    const navLinks = document.querySelectorAll('.nav-btn[data-target], .side-link[data-target]');
+            // Fertilizer Labs Page
+            labsTitle: "🔬 Fertilizer & Soil Testing Labs",
+            labsDesc: "Enter your 6-digit pincode to find nearby labs.",
+            labsPincodePlaceholder: "Enter 6-digit Pincode",
+            labsButton: "Search",
+            labsResultsDefault: "Please enter a pincode to see results.",
+            labsNotFound: "No labs found for this pincode. Please check the number or try a nearby pincode.",
+            // Natural Farming Page
+            farmingTitle: "🌿 Natural Farming",
+            farmingTabIntro: "Introduction",
+            farmingTabPillars: "Key Pillars",
+            farmingTabUpdates: "Latest Updates",
+            farmingTabReading: "Reading Material", // ADDED
+            farmingDesc1: "Zero Budget Natural Farming (ZBNF), or Community Managed Natural Farming (CMNF) as it's known in Andhra Pradesh, is a form of agriculture that avoids all chemical fertilizers and pesticides. It relies on natural inputs that are prepared by the farmer using locally available resources like cow dung, cow urine, jaggery, and pulse flour. It aims to make farming economically viable and climate-resilient.",
+            farmingSubTitle: "Key Pillars:",
+            farmingPillar1: "Jeevamrutham: A microbial culture made from cow dung, urine, jaggery, and water to improve soil fertility.",
+            farmingPillar2: "Beejamrutham: A seed treatment to protect seeds from soil-borne diseases.",
+            farmingPillar3: "Acchadana (Mulching): Covering the soil with crop residues to retain moisture and build humus.",
+            farmingPillar4: "Waaphasa (Soil Aeration): Maintaining a balance of air and water in the soil.",
+            farmingUpdatesTitle: "Latest Updates",
+            farmingUpdate1Title: "Workshop on Jeevamrutham preparation in Guntur",
+            farmingUpdate1Desc: "A state-level workshop will be held on 15th Dec at ANGRAU.",
+            farmingUpdate2Title: "Govt. to provide subsidy for Natural Farming inputs",
+            farmingUpdate2Desc: "A new scheme is announced to support farmers shifting to ZBNF.",
+            // ADDED
+            farmingReadingTitle: "Guides & Books",
+            farmingBook1Title: "'One-Straw Revolution' by Masanobu Fukuoka",
+            farmingBook1Desc: "A foundational text on natural farming principles. Click to learn more.", // UPDATED
+            farmingBook2Title: "ZBNF Community Manual (AP Govt.)",
+            farmingBook2Desc: "Official guide for Community Managed Natural Farming. (PDF Link)", // UPDATED
+            // Contact Page
+            contactTitle: "Contact Us",
+            contactDesc: "Questions or support? Send a message.",
+            contactLabelName: "Your Name",
+            contactPlaceholderName: "Full name",
+            contactLabelEmail: "Your Email",
+            contactPlaceholderEmail: "name@example.com",
+            contactLabelMsg: "Message",
+            contactPlaceholderMsg: "How can we help?",
+            contactButton: "Send Message",
+            // Chat Modal
+            chatTitle: "AI Farm Assistant",
+            chatWelcome: "Hello! I'm your AI Farm Assistant. Ask me anything about farming in Andhra Pradesh.",
+            chatPlaceholder: "Ask about crops, pests...",
+            chatSendButton: "Send"
+        },
+        hi: {
+            appTitle: "एग्री टेक",
+            appSubtitle: "एआई-संचालित कृषि अंतर्दृष्टि",
+            navHome: "होम",
+            navDash: "डैशबोर्ड", // RESTORED
+            navAbout: "हमारे بارے में",
+            navMarket: "बाजार मूल्य",
+            navNews: "समाचार",
+            navSchemes: "योजनाएं",
+            navLabs: "उर्वरक प्रयोगशालाएं",
+            navFarming: "प्राकृतिक खेती",
+            navContact: "संपर्क",
+            // Home Page (Updated)
+            homeWelcomeTitle: "किसान, आपका स्वागत है! 👋",
+            homeWelcomeMsg: "आधुनिक खेती के लिए आपका एआई-संचालित सहायक। हमारे डैशबोर्ड पर मुख्य टूल का उपयोग करें, या लाइव बाजार मूल्य, समाचार और बहुत कुछ के लिए हमारी अन्य सेवाओं का अन्वेषण करें।",
+            homeExploreTitle: "हमारी सेवाओं का अन्वेषण करें",
+            homeToolsTitle: "🌤️ खेती के उपकरण",
+            homeToolsDesc: "मौसम, फसल और कीटनाशक की सिफारिशें एक ही स्थान पर प्राप्त करें।",
+            homeToolsBtn: "डैशबोर्ड पर जाएं",
+            homeMarketTitle: "🌾 बाजार मूल्य",
+            homeMarketDesc: "सर्वोत्तम दर पर अपनी फसल बेचने के लिए लाइव बाजार मूल्य अपडेट प्राप्त करें।",
+            homeMarketBtn: "मूल्य जांचें",
+            homeNewsTitle: "📰 कृषि समाचार",
+            homeNewsDesc: "नवीनतम खेती समाचार, तकनीकों और चेतावनियों के साथ अपडेट रहें।",
+            homeNewsBtn: "समाचार देखें",
+            homeSchemesTitle: "🏛️ सरकारी योजनाएं",
+            homeSchemesDesc: "लाभकारी सरकारी योजनाओं और सब्सिडी के बारे में जानें।",
+            homeSchemesBtn: "योजनाएं देखें",
+            homeLabsTitle: "🔬 मिट्टी परीक्षण प्रयोगशालाएं",
+            homeLabsDesc: "पिनकोड का उपयोग करके अपने क्षेत्र में निकटतम मिट्टी और उर्वरक परीक्षण प्रयोगशालाएं खोजें।",
+            homeLabsBtn: "प्रयोगशालाएं खोजें",
+            homeFarmingTitle: "🌿 प्राकृतिक खेती",
+            homeFarmingDesc: "शून्य बजट प्राकृतिक खेती के सिद्धांतों और लाभों के बारे में जानें।",
+            homeFarmingBtn: "और जानें",
+            // Dashboard Tools (on Dashboard page)
+            weatherTitle: "🌤️ मौसम",
+            weatherDesc: "जलवायु डेटा स्वतः भरने के लिए एक स्थान दर्ज करें।",
+            weatherLabelLocation: "स्थान",
+            weatherButton: "मौसम की जानकारी लें",
+            cropTitle: "🌱 फसल सिफारिश",
+            cropDesc: "सुझाव पाने के लिए मिट्टी और जलवायु डेटा दर्ज करें।",
+            cropLabelN: "नाइट्रोजन (N)",
+            cropLabelP: "फास्फोरस (P)",
+            cropLabelK: "पोटेशियम (K)",
+            cropLabelTemp: "तापमान (°C)",
+            cropLabelHumidity: "आर्द्रता (%)",
+            cropLabelPh: "pH",
+            cropLabelRain: "वर्षा (mm)",
+            cropButton: "फसल की सिफारिश करें",
+            cropLabelResult: "भविष्यवाणी परिणाम",
+            cropResultDefault: "अभी तक कोई भविष्यवाणी नहीं",
+            pestTitle: "🧴 कीटनाशक सिफारिश",
+            pestDesc: "अपनी फसल और पहचाने गए कीट का चयन करें।",
+            pestLabelCrop: "फसल",
+            pestLoadingCrop: "फसलें लोड हो रही हैं...",
+            pestLabelPest: "कीट",
+            pestSelectCropFirst: "पहले एक फसल चुनें...",
+            pestButton: "कीटनाशक प्राप्त करें",
+            pestLabelResult: "अनुशंसित कीटनाशक",
+            // About Page
+            aboutTitle: "स्मार्ट फार्मर असिस्टेंट के बारे में",
+            aboutDesc: "यह परियोजना आंध्र प्रदेश के किसानों को डेटा-संचालित निर्णय लेने में सहायता करने के लिए डिज़ाइन किया गया एक व्यापक, एआई-संचालित उपकरण है। यह फसल सिफारिशों के लिए एक मशीन लर्निंग मॉडल का लाभ उठाता है और एआई चैटबॉट के माध्यम से वास्तविक समय के मौसम डेटा और विशेषज्ञ-स्तर की कृषि सलाह के लिए शक्तिशाली एपीआई के साथ एकीकृत होता है।",
+            // Market Page
+            marketTitle: "🌾 बाजार मूल्य अपडेट",
+            marketRefreshBtn: "रिफ्रेश",
+            marketDesc: "लाइव मूल्य प्राप्त करने के लिए अपना बाजार चुनें और रिफ्रेश करें।",
+            marketLabelSelect: "बाजार यार्ड चुनें",
+            marketAnantapur: "अनंतपुर",
+            marketGuntur: "गुंटूर",
+            marketKadapa: "कडपा",
+            marketLoading: "Google से लाइव मूल्य प्राप्त किए जा रहे हैं...",
+            marketHeaderCrop: "फसल",
+            marketHeaderVariety: "किस्म",
+            marketHeaderPrice: "मूल्य (प्रति क्विंटल)",
+            marketCropPaddy: "धान",
+            marketVarietyCommon: "सामान्य",
+            marketCropCotton: "कपास",
+            marketVarietyLong: "लंबा रेशा",
+            marketCropChilli: "लाल मिर्च",
+            marketVarietyTeja: "तेजा",
+            marketCropGroundnut: "मूंगफली",
+            marketVarietyK6: "K6",
+            // News Page
+            newsTitle: "📰 कृषि समाचार",
+            newsRefreshBtn: "रिफ्रेश",
+            newsDesc: "लाइव कृषि अपडेट, जेमिनी द्वारा संचालित।",
+            newsLoading: "जेमिनी से नवीनतम समाचार प्राप्त किए जा रहे हैं...",
+            news1Title: "रायలసీమ के लिए मानसून का पूर्वानुमान अपडेट किया गया",
+            news1Desc: "आईएमडी ने आगामी खरीफ सीजन के लिए सामान्य बारिश की भविष्यवाणी की...",
+            news2Title: "धान का एमएसपी 5% बढ़ा",
+            news2Desc: "केंद्र सरकार ने नए न्यूनतम समर्थन मूल्य की घोषणा की...",
+            // Schemes Page
+            schemesTitle: "🏛️ सरकारी योजनाएं",
+            schemesDesc: "उपलब्ध सहायता और समर्थन कार्यक्रम खोजें। आधिकारिक साइट पर जाने के लिए किसी आइटम पर क्लिक करें।", // UPDATED
+            // ADDED Scheme Tab Keys
+            schemesTabState: "राज्य योजनाएं",
+            schemesTabCentral: "केंद्रीय योजनाएं",
+            schemesTabPrivate: "निजी / एनजीओ",
+            
+            scheme1Title: "वाईएसआर रायथु भरोसा",
+            scheme1Desc: "किसान परिवारों को प्रति वर्ष ₹13,500 की वित्तीय सहायता। भेंट करने के लिए क्लिक करें।", // UPDATED
+            scheme2Title: "प्रधानमंत्री फसल बीमा योजना (PMFBY)",
+            scheme2Desc: "फसल खराब होने की स्थिति में बीमा कवरेज और वित्तीय सहायता। भेंट करने के लिए क्लिक करें।", // UPDATED
+            scheme3Title: "पर ड्रॉप मोर क्रॉप (माइक्रो-इरिगेशन)",
+            scheme3Desc: "ड्रिप और स्प्रिंकलर सिंचाई प्रणाली स्थापित करने के लिए सब्सिडी उपलब्ध है। भेंट करने के लिए क्लिक करें।", // UPDATED
+
+            // ADDED New Scheme Keys
+            schemeState2Title: "वाईएसआर मुफ्त कृषि बिजली",
+            schemeState2Desc: "खेती के लिए 9 घंटे मुफ्त बिजली की आपूर्ति। भेंट करने के लिए क्लिक करें।",
+            schemePrivate1Title: "रिलायंस फाउंडेशन",
+            schemePrivate1Desc: "किसानों को डिजिटल सलाह और सहायता प्रदान करना। अधिक जानने के लिए क्लिक करें।",
+            
+            // Fertilizer Labs Page
+            labsTitle: "🔬 उर्वरक और मिट्टी परीक्षण प्रयोगशालाएं",
+            labsDesc: "आस-पास की प्रयोगशालाओं को खोजने के लिए अपना 6 अंकों का पिनकोड दर्ज करें।",
+            labsPincodePlaceholder: "6 अंकों का पिनकोड दर्ज करें",
+            labsButton: "खोजें",
+            labsResultsDefault: "परिणाम देखने के लिए कृपया एक पिनकोड दर्ज करें।",
+            labsNotFound: "इस पिनकोड के लिए कोई प्रयोगशाला नहीं मिली। कृपया नंबर जांचें या आस-पास का पिनकोड आज़माएं।",
+            // Natural Farming Page
+            farmingTitle: "🌿 प्राकृतिक खेती",
+            farmingTabIntro: "परिचय",
+            farmingTabPillars: "मुख्य स्तंभ",
+            farmingTabUpdates: "नवीनतम अपडेट",
+            farmingTabReading: "पठन सामग्री", // ADDED
+            farmingDesc1: "शून्य बजट प्राकृतिक खेती (ZBNF), या जैसा कि आंध्र प्रदेश में जाना जाता है, सामुदायिक प्रबंधित प्राकृतिक खेती (CMNF), कृषि का एक रूप है जो सभी रासायनिक उर्वरकों और कीटनाशकों से बचता है। यह प्राकृतिक आदानों पर निर्भर करता है जो किसान द्वारा स्थानीय रूप से उपलब्ध संसाधनों जैसे गाय का गोबर, गोमूत्र, गुड़ और दाल के आटे का उपयोग करके तैयार किए जाते हैं। इसका उद्देश्य खेती को आर्थिक रूप से व्यवहार्य और जलवायु-लचीला बनाना है।",
+            farmingSubTitle: "मुख्य स्तंभ:",
+            farmingPillar1: "जीवामृत: मिट्टी की उर्वरता में सुधार के लिए गाय के गोबर, मूत्र, गुड़ और पानी से बना एक माइक्रोबियल कल्चर।",
+            farmingPillar2: "बीजामृत: बीजों को मिट्टी जनित रोगों से बचाने के लिए एक बीज उपचार।",
+            farmingPillar3: "आच्छादन (मल्चिंग): नमी बनाए रखने और ह्यूमस बनाने के लिए मिट्टी को फसल अवशेषों से ढकना।",
+            farmingPillar4: "वाफसा (मिट्टी वातन): मिट्टी में हवा और पानी का संतुलन बनाए रखना।",
+            farmingUpdatesTitle: "नवीनतम अपडेट",
+            farmingUpdate1Title: "गुंटूर में जीवामृत तैयारी पर कार्यशाला",
+            farmingUpdate1Desc: "ANGRAU में 15 दिसंबर को एक राज्य स्तरीय कार्यशाला आयोजित की जाएगी।",
+            farmingUpdate2Title: "प्राकृतिक खेती आदानों के लिए सरकार सब्सिडी प्रदान करेगी",
+            farmingUpdate2Desc: "ZBNF में स्थानांतरित होने वाले किसानों का समर्थन करने के लिए एक नई योजना की घोषणा की गई है।",
+            // ADDED
+            farmingReadingTitle: "गाइड और किताबें",
+            farmingBook1Title: "'वन-स्ट्रॉ रेवोल्यूशन' - मासानोबू फुकुओका",
+            farmingBook1Desc: "प्राकृतिक खेती के सिद्धांतों पर एक मूलभूत पाठ। अधिक जानने के लिए क्लिक करें।", // UPDATED
+            farmingBook2Title: "ZBNF सामुदायिक मैनुअल (एपी सरकार)",
+            farmingBook2Desc: "सामुदायिक प्रबंधित प्राकृतिक खेती के लिए आधिकारिक गाइड। (पीडीएफ लिंक)", // UPDATED
+            // Contact Page
+            contactTitle: "हमसे संपर्क करें",
+            contactDesc: "प्रश्न या समर्थन? एक संदेश भेजें।",
+            contactLabelName: "आपका नाम",
+            contactPlaceholderName: "पूरा नाम",
+            contactLabelEmail: "आपका ईमेल",
+            contactPlaceholderEmail: "name@example.com",
+            contactLabelMsg: "संदेश",
+            contactPlaceholderMsg: "हम कैसे मदद कर सकते हैं?",
+            contactButton: "संदेश भेजें",
+            // Chat Modal
+            chatTitle: "एआई फार्म असिस्टेंट",
+            chatWelcome: "नमस्ते! मैं आपका एआई फार्म असिस्टेंट हूं। मुझसे आंध्र प्रदेश में खेती के बारे में कुछ भी पूछें।",
+            chatPlaceholder: "फसलों, कीटों के बारे में पूछें...",
+            chatSendButton: "भेजें"
+        },
+        te: {
+            appTitle: "అగ్రి టెక్",
+            appSubtitle: "AI-ఆధారిత వ్యవసాయ అంతర్దృష్టులు",
+            navHome: "హోమ్",
+            navDash: "డాష్‌బోర్డ్‌లు", // RESTORED
+            navAbout: "గురించి",
+            navMarket: "మార్కెట్ ధరలు",
+            navNews: "వార్తలు",
+            navSchemes: "పథకాలు",
+            navLabs: "ఎరువుల ల్యాబ్‌లు",
+            navFarming: "సహజ వ్యవసాయం",
+            navContact: "సంప్రదించండి",
+            // Home Page (Updated)
+            homeWelcomeTitle: "రైతు సోదరులకు స్వాగతం! 👋",
+            homeWelcomeMsg: "ఆధునిక వ్యవసాయం కోసం మీ AI-ఆధారిత సహాయకుడు. మా డాష్‌బోర్డ్‌లో ప్రధాన సాధనాలను ఉపయోగించండి లేదా ప్రత్యక్ష మార్కెట్ ధరలు, వార్తలు మరియు మరిన్నింటి కోసం మా ఇతర సేవలను అన్వేషించండి.",
+            homeExploreTitle: "మా సేవలను అన్వేషించండి",
+            homeToolsTitle: "🌤️ వ్యవసాయ ఉపకరణాలు",
+            homeToolsDesc: "వాతావరణం, పంట మరియు పురుగుమందుల సిఫార్సులను ఒకే చోట యాక్సెస్ చేయండి.",
+            homeToolsBtn: "డాష్‌బోర్డ్‌లకు వెళ్లండి",
+            homeMarketTitle: "🌾 మార్కెట్ ధరలు",
+            homeMarketDesc: "మీ పంటలను ఉత్తమ ధరకు విక్రయించడానికి ప్రత్యక్ష మార్కెట్ ధర నవీకరణలను పొందండి.",
+            homeMarketBtn: "ధరలను తనిఖీ చేయండి",
+            homeNewsTitle: "📰 వ్యవసాయ వార్తలు",
+            homeNewsDesc: "తాజా వ్యవసాయ వార్తలు, సాంకేతికతలు మరియు హెచ్చరికలతో నవీకరించబడండి.",
+            homeNewsBtn: "వార్తలను చూడండి",
+            homeSchemesTitle: "🏛️ ప్రభుత్వ పథకాలు",
+            homeSchemesDesc: "ప్రయోజనకరమైన ప్రభుత్వ పథకాలు మరియు రాయితీల గురించి కనుగొనండి మరియు తెలుసుకోండి.",
+            homeSchemesBtn: "పథకాలను చూడండి",
+            homeLabsTitle: "🔬 నేల పరీక్షా కేంద్రాలు",
+            homeLabsDesc: "పిన్‌కోడ్‌ను ఉపయోగించి మీ ప్రాంతంలోని సమీప నేల మరియు ఎరువుల పరీక్షా కేంద్రాలను కనుగొనండి.",
+            homeLabsBtn: "ల్యాబ్‌లను కనుగొనండి",
+            homeFarmingTitle: "🌿 సహజ వ్యవసాయం",
+            homeFarmingDesc: "జీరో బడ్జెట్ నేచురల్ ఫార్మింగ్ సూత్రాలు మరియు ప్రయోజనాల గురించి తెలుసుకోండి.",
+            homeFarmingBtn: "మరింత తెలుసుకోండి",
+            // Dashboard Tools (on Dashboard page)
+            weatherTitle: "🌤️ వాతావరణం",
+            weatherDesc: "వాతావరణ డేటాను ఆటో-ఫిల్ చేయడానికి ఒక ప్రదేశాన్ని నమోదు చేయండి.",
+            weatherLabelLocation: "ప్రదేశం",
+            weatherButton: "వాతావరణం పొందండి",
+            cropTitle: "🌱 పంట సిఫార్సు",
+            cropDesc: "సూచనను పొందడానికి నేల & వాతావరణ డేటాను నమోదు చేయండి.",
+            cropLabelN: "నత్రజని (N)",
+            cropLabelP: "భాస్వరం (P)",
+            cropLabelK: "పొటాషియం (K)",
+            cropLabelTemp: "ఉష్ణోగ్రత (°C)",
+            cropLabelHumidity: "తేమ (%)",
+            cropLabelPh: "pH",
+            cropLabelRain: "వర్షపాతం (mm)",
+            cropButton: "పంటను సిఫార్సు చేయండి",
+            cropLabelResult: "అంచనా ఫలితం",
+            cropResultDefault: "ఇంకా అంచనా వేయలేదు",
+            pestTitle: "🧴 పురుగుమందుల సిఫార్సు",
+            pestDesc: "మీ పంట మరియు గుర్తించిన పురుగును ఎంచుకోండి.",
+            pestLabelCrop: "పంట",
+            pestLoadingCrop: "పంటలు లోడ్ అవుతున్నాయి...",
+            pestLabelPest: "పురుగు",
+            pestSelectCropFirst: "ముందుగా పంటను ఎంచుకోండి...",
+            pestButton: "పురుగుమందును పొందండి",
+            pestLabelResult: "సిఫార్సు చేయబడిన పురుగుమందు",
+            // About Page
+            aboutTitle: "స్మార్ట్ ఫార్మర్ అసిస్టెంట్ గురించి",
+            aboutDesc: "ఈ ప్రాజెక్ట్ ఆంధ్రప్రదేశ్ రైతులకు డేటా-ఆధారిత నిర్ణయాలు తీసుకోవడంలో సహాయపడటానికి రూపొందించబడిన ఒక సమగ్ర, AI-ఆధారిత సాధనం. ఇది పంట సిఫార్సుల కోసం మెషిన్ లెర్నింగ్ మోడల్‌ను ప్రభావితం చేస్తుంది మరియు AI చాట్‌బాట్ ద్వారా నిజ-సమయ వాతావరణ డేటా మరియు నిపుణుల-స్థాయి వ్యవసాయ సలహా కోసం శక్తివంతమైన APIలతో అనుసంధానిస్తుంది.",
+            // Market Page
+            marketTitle: "🌾 మార్కెట్ ధర నవీకరణలు",
+            marketRefreshBtn: "రిఫ్రెష్",
+            marketDesc: "ప్రత్యక్ష ధరలను పొందడానికి మీ మార్కెట్‌ను ఎంచుకుని, రిఫ్రెష్ చేయండి.",
+            marketLabelSelect: "మార్కెట్ యార్డ్‌ను ఎంచుకోండి",
+            marketAnantapur: "అనంతపురం",
+            marketGuntur: "గుంటూరు",
+            marketKadapa: "కడప",
+            marketLoading: "Google నుండి ప్రత్యక్ష ధరలను పొందుతోంది...",
+            marketHeaderCrop: "పంట",
+            marketHeaderVariety: "రకం",
+            marketHeaderPrice: "ధర (క్వింటాల్‌కు)",
+            marketCropPaddy: "వరి",
+            marketVarietyCommon: "సాధారణ",
+            marketCropCotton: "పత్తి",
+            marketVarietyLong: "పొడవాటి దారం",
+            marketCropChilli: "ఎర్ర మిర్చి",
+            marketVarietyTeja: "తేజ",
+            marketCropGroundnut: "వేరుశెనగ",
+            marketVarietyK6: "K6",
+            // News Page
+            newsTitle: "📰 వ్యవసాయ వార్తలు",
+            newsRefreshBtn: "రిఫ్రెష్",
+            newsDesc: "ప్రత్యక్ష వ్యవసాయ నవీకరణలు, జెమిని ద్వారా ఆధారితం.",
+            newsLoading: "జెమిని నుండి తాజా వార్తలను పొందుతోంది...",
+            news1Title: "రాయలసీమకు రుతుపవనాల సూచన నవీకరించబడింది",
+            news1Desc: "రాబోయే ఖరీఫ్ సీజన్‌కు సాధారణ వర్షపాతం ఉంటుందని IMD అంచనా...",
+            news2Title: "వరికి ఎంఎస్‌పి 5% పెరిగింది",
+            news2Desc: "కొత్త కనీస మద్దతు ధరను కేంద్ర ప్రభుత్వం ప్రకటించింది...",
+            // Schemes Page
+            schemesTitle: "🏛️ ప్రభుత్వ పథకాలు",
+            schemesDesc: "అందుబాటులో ఉన్న సహాయం మరియు మద్దతు కార్యక్రమాలను కనుగొనండి. అధికారిక సైట్‌ను సందర్శించడానికి ఒక ఐటెమ్‌పై క్లిక్ చేయండి.", // UPDATED
+            // ADDED Scheme Tab Keys
+            schemesTabState: "రాష్ట్ర పథకాలు",
+            schemesTabCentral: "కేంద్ర పథకాలు",
+            schemesTabPrivate: "ప్రైవేట్ / NGO",
+
+            scheme1Title: "YSR రైతు భరోసా",
+            scheme1Desc: "రైతు కుటుంబాలకు ఏటా ₹13,500 ఆర్థిక సహాయం. సందర్శించడానికి క్లిక్ చేయండి.", // UPDATED
+            scheme2Title: "ప్రధాన్ మంత్రి ఫసల్ బీమా యోజన (PMFBY)",
+            scheme2Desc: "పంట నష్టం జరిగితే భీమా కవరేజ్ మరియు ఆర్థిక మద్దతు. సందర్శించడానికి క్లిక్ చేయండి.", // UPDATED
+            scheme3Title: "ప్రతి డ్రాప్ మోర్ క్రాప్ (మైక్రో-ఇరిగేషన్)",
+            scheme3Desc: "డ్రిప్ మరియు స్ప్రింక్లర్ నీటిపారుదల వ్యవస్థలను ఏర్పాటు చేయడానికి సబ్సిడీలు అందుబాటులో ఉన్నాయి. సందర్శించడానికి క్లిక్ చేయండి.", // UPDATED
+            
+            // ADDED New Scheme Keys
+            schemeState2Title: "YSR ఉచిత వ్యవసాయ విద్యుత్",
+            schemeState2Desc: "వ్యవసాయానికి 9 గంటల ఉచిత విద్యుత్ సరఫరా. సందర్శించడానికి క్లిక్ చేయండి.",
+            schemePrivate1Title: "రిలయన్స్ ఫౌండేషన్",
+            schemePrivate1Desc: "రైతులకు డిజిటల్ సలహాలు మరియు మద్దతు అందించడం. మరింత తెలుసుకోవడానికి క్లిక్ చేయండి.",
+
+            // Fertilizer Labs Page
+            labsTitle: "🔬 ఎరువులు & నేల పరీక్షా కేంద్రాలు",
+            labsDesc: "సమీపంలోని ల్యాబ్‌లను కనుగొనడానికి మీ 6-అంకెల పిన్‌కోడ్‌ను నమోదు చేయండి.",
+            labsPincodePlaceholder: "6-అంకెల పిన్‌కోడ్‌ను నమోదు చేయండి",
+            labsButton: "శోధించండి",
+            labsResultsDefault: "దయచేసి ఫలితాలను చూడటానికి పిన్‌కోడ్‌ను నమోదు చేయండి.",
+            labsNotFound: "ఈ పిన్‌కోడ్ కోసం ల్యాబ్‌లు కనుగొనబడలేదు. దయచేసి నంబర్‌ను తనిఖీ చేయండి లేదా సమీపంలోని పిన్‌కోడ్‌ను ప్రయత్నించండి.",
+            // Natural Farming Page
+            farmingTitle: "🌿 సహజ వ్యవసాయం",
+            farmingTabIntro: "పరిచయం",
+            farmingTabPillars: "ముఖ్య స్తంభాలు",
+            farmingTabUpdates: "తాజా నవీకరణలు",
+            farmingTabReading: "పఠన సామగ్రి", // ADDED
+            farmingDesc1: "జీరో బడ్జెట్ నేచురల్ ఫార్మింగ్ (ZBNF), లేదా ఆంధ్ర ప్రదేశ్‌లో పిలువబడే కమ్యూనిటీ మేనేజ్డ్ నేచురల్ ఫార్మింగ్ (CMNF), అన్ని రసాయన ఎరువులు మరియు పురుగుమందులను నివారించే వ్యవసాయం. ఇది ఆవు పేడ, గోమూత్రం, బెల్లం మరియు పప్పుల పిండి వంటి స్థానికంగా లభించే వనరులను ఉపయోగించి రైతు తయారుచేసిన సహజ ఇన్‌పుట్‌లపై ఆధారపడి ఉంటుంది. ఇది వ్యవసాయాన్ని ఆర్థికంగా లాభదాయకంగా మరియు వాతEOUSAN, వాతEOUSAN, వాతEOUSAN, వాతEOUSAN, వాతEOUSAN, వాతEOUSAN, వాతEOUSAN, వాతEOUSAN.",
+            farmingSubTitle: "ముఖ్య స్తంభాలు:",
+            farmingPillar1: "జీవామృతం: నేల సారాన్ని మెరుగుపరచడానికి ఆవు పేడ, మూత్రం, బెల్లం మరియు నీటితో చేసిన సూక్ష్మజీవుల మిశ్రమం.",
+            farmingPillar2: "బీజామృతం: విత్తనాలను నేల ద్వారా సంక్రమించే వ్యాధుల నుండి రక్షించడానికి విత్తన శుద్ధి.",
+            farmingPillar3: "ఆచ్ఛాదన (మల్చింగ్): తేమను నిలుపుకోవడానికి మరియు హ్యూమస్‌ను పెంచడానికి నేలను పంట అవశేషాలతో కప్పడం.",
+            farmingPillar4: "వాఫస (నేల వాయుప్రసరణ): నేలలో గాలి మరియు నీటి సమతుల్యతను నిర్వహించడం.",
+            farmingUpdatesTitle: "తాజా నవీకరణలు",
+            farmingUpdate1Title: "గుంటూరులో జీవామృతం తయారీపై వర్క్‌షాప్",
+            farmingUpdate1Desc: "డిసెంబర్ 15న ఆచార్య ఎన్.జి.రంగా వ్యవసాయ విశ్వవిద్యాలయంలో రాష్ట్ర స్థాయి వర్క్‌షాప్ నిర్వహించబడుతుంది.",
+            farmingUpdate2Title: "సహజ వ్యవసాయ ఇన్‌పుట్‌ల కోసం ప్రభుత్వం సబ్సిడీ",
+            farmingUpdate2Desc: "ZBNFకి మారుతున్న రైతులకు మద్దతుగా కొత్త పథకం ప్రకటించబడింది.",
+            // ADDED
+            farmingReadingTitle: "మార్గదర్శకాలు & పుస్తకాలు",
+            farmingBook1Title: "'వన్-స్ట్రా రివల్యూషన్' - మసనోబు ఫుకుఓకా",
+            farmingBook1Desc: "సహజ వ్యవసాయ సూత్రాలపై ఒక ప్రాథమిక గ్రంథం. మరింత తెలుసుకోవడానికి క్లిక్ చేయండి.", // UPDATED
+            farmingBook2Title: "ZBNF కమ్యూనిటీ మాన్యువల్ (AP Govt.)",
+            farmingBook2Desc: "కమ్యూనిటీ మేనేజ్డ్ నేచురల్ ఫార్మింగ్ కోసం అధికారిక గైడ్. (PDF లింక్)", // UPDATED
+            // Contact Page
+            contactTitle: "మమ్మల్ని సంప్రదించండి",
+            contactDesc: "ప్రశ్నలు లేదా మద్దతు? ఒక సందేశం పంపండి.",
+            contactLabelName: "మీ పేరు",
+            contactPlaceholderName: "పూర్తి పేరు",
+            contactLabelEmail: "మీ ఇమెయిల్",
+            contactPlaceholderEmail: "name@example.com",
+            contactLabelMsg: "సందేశం",
+            contactPlaceholderMsg: "మేము ఎలా సహాయపడగలము?",
+            contactButton: "సందేశం పంపండి",
+            // Chat Modal
+            chatTitle: "AI ఫార్మ్ అసిస్టెంట్",
+            chatWelcome: "నమస్కారం! నేను మీ AI ఫార్మ్ అసిస్టెంట్‌ని. ఆంధ్ర ప్రదేశ్‌లో వ్యవసాయం గురించి నన్ను ఏదైనా అడగండి.",
+            chatPlaceholder: "పంటలు, తెగుళ్ల గురించి అడగండి...",
+            chatSendButton: "పంపండి"
+        }
+    };
+
+    const langSwitch = document.getElementById('langSwitch');
+    let recognition; // Declare recognition in the outer scope
+
+    function switchLanguage(lang) {
+        if (!translations[lang]) lang = 'en';
+        
+        document.querySelectorAll('[data-lang-key]').forEach(el => {
+            const key = el.dataset.langKey;
+            if (translations[lang][key]) {
+                el.textContent = translations[lang][key];
+            }
+        });
+        
+        // Update placeholders for inputs
+        document.querySelectorAll('[data-lang-placeholder]').forEach(el => {
+             const key = el.dataset.langPlaceholder;
+             if(translations[lang][key]) {
+                el.placeholder = translations[lang][key];
+             }
+        });
+
+        // Update voice recognition language
+        if (recognition) {
+            if (lang === 'hi') recognition.lang = 'hi-IN';
+            else if (lang === 'te') recognition.lang = 'te-IN';
+            else recognition.lang = 'en-US';
+        }
+    }
+
+    langSwitch.addEventListener('change', (e) => {
+        switchLanguage(e.target.value);
+    });
+    // --- End Language Engine ---
+
+
+    // --- Backend API Configuration ---
+    const API_BASE_URL = "http://127.0.0.1:8000";
+    
+    /**
+     * Calls the Gemini API with a specific prompt and system instruction.
+     * Includes Google Search grounding.
+     */
+    async function callGemini(userPrompt, systemPrompt, isJson = false) {
+        const payload = {
+            contents: [{ parts: [{ text: userPrompt }] }],
+            tools: [{ "google_search": {} }],
+            systemInstruction: {
+                parts: [{ text: systemPrompt }]
+            },
+        };
+        
+        if (isJson) {
+            payload.generationConfig = {
+                responseMimeType: "application/json",
+            };
+        }
+
+        // Exponential backoff for retries
+        let response;
+        let retries = 0;
+        const maxRetries = 3;
+        let delay = 1000;
+
+        while (retries < maxRetries) {
+            try {
+                response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const candidate = result.candidates?.[0];
+                    if (candidate && candidate.content?.parts?.[0]?.text) {
+                        return candidate.content.parts[0].text;
+                    } else {
+                        throw new Error("Invalid API response structure");
+                    }
+                } else {
+                    // Handle non-OK responses (like 429 Too Many Requests)
+                    if (response.status === 429 || response.status >= 500) {
+                        console.warn(`API call failed with status ${response.status}. Retrying in ${delay}ms...`);
+                        await new Promise(res => setTimeout(res, delay));
+                        delay *= 2; // Double the delay
+                        retries++;
+                    } else {
+                        // For other errors (like 400 Bad Request), don't retry
+                        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                    }
+                }
+            } catch (error) {
+                // Handle network errors
+                console.warn(`Network error during API call. Retrying in ${delay}ms...`);
+                await new Promise(res => setTimeout(res, delay));
+                delay *= 2;
+                retries++;
+            }
+        }
+
+        // If all retries fail
+        throw new Error("API call failed after several retries.");
+    }
+    // --- End Gemini API ---
+
+
+    // --- Navigation ---
+    const navLinks = document.querySelectorAll('[data-target]');
     const pages = document.querySelectorAll('.page');
 
     function setActiveSection(targetId) {
+        const targetPage = document.getElementById(targetId);
+        if (!targetPage) {
+            console.warn(`Navigation target "${targetId}" not found.`);
+            return;
+        }
+
         pages.forEach(page => page.classList.toggle('active', page.id === targetId));
-        navLinks.forEach(link => link.classList.toggle('active', link.dataset.target === targetId));
+        
+        // Update active state for main nav and sidebar links
+        document.querySelectorAll('.nav-btn[data-target], .side-link[data-target]').forEach(link => {
+            link.classList.toggle('active', link.dataset.target === targetId);
+        });
+        
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     
     navLinks.forEach(link => {
         link.addEventListener('click', (e) => {
             if (e.currentTarget.dataset.target) {
+                e.preventDefault(); // Prevent default button behavior
                 setActiveSection(e.currentTarget.dataset.target)
             }
         });
@@ -561,8 +1664,216 @@ document.addEventListener('DOMContentLoaded', () => {
             pesticideResultEl.textContent = `Error: ${error.message}`;
         }
     });
+    
+    // --- Live Market Price API ---
+    const refreshMarketBtn = document.getElementById('refreshMarketBtn');
+    const marketSelect = document.getElementById('marketSelect');
+    const marketTableBody = document.getElementById('market-table-body');
+    const marketLoading = document.getElementById('marketLoading');
 
-    // --- AI Chatbot (Now in a Modal) ---
+    refreshMarketBtn.addEventListener('click', async () => {
+        const market = marketSelect.value;
+        marketLoading.style.display = 'block';
+        refreshMarketBtn.disabled = true;
+        marketTableBody.innerHTML = ''; // Clear table
+        
+        const userPrompt = `Find the latest commodity prices for 4 major crops (like Paddy, Cotton, Chilli, Groundnut) in the ${market}, Andhra Pradesh market.`;
+        const systemPrompt = `You are an agriculture market data assistant. Find the latest prices for 4 major crops in the specified market. Provide the output as a JSON array of objects, where each object has "crop" (string), "variety" (string), and "price" (string, e.g., "₹6,800 - ₹7,200"). If you cannot find data for a specific crop, substitute another common crop for that market. Return ONLY the JSON array.
+        Example:
+        [
+          {"crop": "Paddy", "variety": "Sona Masuri", "price": "₹2,000 - ₹2,200"},
+          {"crop": "Cotton", "variety": "Long Staple", "price": "₹7,000 - ₹7,300"},
+          {"crop": "Red Chilli", "variety": "Teja", "price": "₹19,000 - ₹21,500"},
+          {"crop": "Groundnut", "variety": "K6", "price": "₹6,600 - ₹7,100"}
+        ]`;
+        
+        try {
+            const rawResponse = await callGemini(userPrompt, systemPrompt, true);
+            // Clean the response if it's wrapped in markdown
+            const jsonText = rawResponse.replace(/```json\n|```/g, "").trim();
+            const data = JSON.parse(jsonText);
+            
+            if (data && data.length > 0) {
+                data.forEach(item => {
+                    marketTableBody.innerHTML += `
+                        <tr>
+                            <td>${item.crop}</td>
+                            <td>${item.variety}</td>
+                            <td>${item.price}</td>
+                        </tr>
+                    `;
+                });
+            } else {
+                marketTableBody.innerHTML = '<tr><td colspan="3">No live data found.</td></tr>';
+            }
+        } catch (error) {
+            console.error("Error fetching market prices:", error);
+            marketTableBody.innerHTML = `<tr><td colspan="3">Error loading live data. Displaying defaults.</td></tr>`;
+            // Add back default mock data on error
+            marketTableBody.innerHTML += document.getElementById('market-table-body').innerHTML; // This is a fallback, ideally repopulate
+        } finally {
+            marketLoading.style.display = 'none';
+            refreshMarketBtn.disabled = false;
+        }
+    });
+
+    // --- Live News API ---
+    const refreshNewsBtn = document.getElementById('refreshNewsBtn');
+    const newsList = document.getElementById('news-list');
+    const newsLoading = document.getElementById('newsLoading');
+    
+    refreshNewsBtn.addEventListener('click', async () => {
+        newsLoading.style.display = 'block';
+        refreshNewsBtn.disabled = true;
+        newsList.innerHTML = ''; // Clear list
+        
+        const userPrompt = "Find the 3 most recent and important agriculture news headlines related to Andhra Pradesh or India.";
+        const systemPrompt = `You are an agriculture news assistant. Find 3 recent, relevant news headlines for farmers. Provide the output as a JSON array of objects, where each object has "icon" (string, an emoji like 🌦️, 💰, 🔬, 🌱), "headline" (string), "summary" (string), and "url" (string, a valid URL to the news source). Return ONLY the JSON array.
+        Example:
+        [
+          {"icon": "🌦️", "headline": "IMD predicts early monsoon for Andhra Pradesh", "summary": "The India Meteorological Department has forecast an early arrival...", "url": "https://example.com/news1"},
+          {"icon": "💰", "headline": "Government increases MSP for Kharif crops", "summary": "The Cabinet has approved a hike in MSP for 14 Kharif crops...", "url": "https://example.com/news2"},
+          {"icon": "🌱", "headline": "New pest-resistant cotton variety shows promise", "summary": "A new variant developed by ANGRAU is showing high resistance...", "url": "https://example.com/news3"}
+        ]`;
+        
+        try {
+            const rawResponse = await callGemini(userPrompt, systemPrompt, true);
+            // Clean the response if it's wrapped in markdown
+            const jsonText = rawResponse.replace(/```json\n|```/g, "").trim();
+            const data = JSON.parse(jsonText);
+            
+            if (data && data.length > 0) {
+                 data.forEach(item => {
+                    newsList.innerHTML += `
+                    <div class="list-item">
+                        <a href="${item.url}" target="_blank" rel="noopener noreferrer">
+                            <div class="list-item-icon">${item.icon}</div>
+                            <div class="list-item-content">
+                                <h3>${item.headline}</h3>
+                                <p>${item.summary}</p>
+                            </div>
+                        </a>
+                    </div>`;
+                });
+            } else {
+                 newsList.innerHTML = '<p class="muted">No live news found.</p>';
+            }
+        } catch (error) {
+            console.error("Error fetching news:", error);
+            newsList.innerHTML = '<p class="muted">Error loading live news. Please try again.</p>';
+        } finally {
+            newsLoading.style.display = 'none';
+            refreshNewsBtn.disabled = false;
+        }
+    });
+
+
+    // --- Fertilizer Lab Pincode Search (Mock) ---
+    const findLabsBtn = document.getElementById('findLabsBtn');
+    const pincodeInput = document.getElementById('pincodeInput');
+    const labResults = document.getElementById('labResults');
+    
+    const mockLabData = {
+        "515001": [
+            { name: "District Soil Testing Lab, Anantapur", desc: "Opp. Collectorate, Anantapur. Ph: 08554-22XXXX" },
+            { name: "Agri Clinic, SV Nagar", desc: "Near 1st Road, SV Nagar, Anantapur." }
+        ],
+        "522001": [
+            { name: "Regional Soil Testing Lab, Guntur", desc: "Near Market Yard, Guntur. Ph: 0863-23XXXX" }
+        ],
+        "516001": [
+            { name: "Mobile Soil Testing Van, Kadapa", desc: "Contact local Agriculture Officer for schedule." }
+        ],
+        "515002": [
+            { name: "Rural Agri Center, Anantapur", desc: "Main Road, Anantapur Rural." }
+        ],
+        "522002": [
+            { name: "Pesticide & Fertilizer Lab, Guntur", desc: "Industrial Estate, Guntur." }
+        ]
+    };
+    
+    findLabsBtn.addEventListener('click', () => {
+        const pincode = pincodeInput.value.trim();
+        labResults.innerHTML = ""; // Clear previous results
+        
+        if (pincode.length !== 6) {
+             const currentLang = langSwitch.value || 'en';
+             const notFoundText = translations[currentLang].labsNotFound || "Please enter a valid 6-digit pincode.";
+             labResults.innerHTML = `<p class="muted">${notFoundText.split('.')[0] + ". Please enter a valid 6-digit pincode."}</p>`;
+             return;
+        }
+        
+        // MOCK: Simulate search
+        const labs = mockLabData[pincode];
+        
+        if (labs && labs.length > 0) {
+             labs.forEach(lab => {
+                labResults.innerHTML += `
+                <div class="list-item">
+                    <div class="list-item-icon">📍</div>
+                    <div class="list-item-content">
+                        <h3>${lab.name}</h3>
+                        <p>${lab.desc}</p>
+                    </div>
+                </div>`;
+            });
+        } else {
+            const currentLang = langSwitch.value || 'en';
+            const notFoundText = translations[currentLang].labsNotFound || "No labs found for this pincode.";
+            labResults.innerHTML = `<p class="muted">${notFoundText}</p>`;
+        }
+    });
+
+    // --- Natural Farming Tabs ---
+    const farmingTabBtns = document.querySelectorAll('#naturalFarmingPage .tab-btn'); // MADE SPECIFIC
+    const farmingTabContents = document.querySelectorAll('#naturalFarmingPage .tab-content'); // MADE SPECIFIC
+    
+    farmingTabBtns.forEach(btn => { // RENAMED
+        btn.addEventListener('click', () => {
+            // Remove active class from all buttons and content
+            farmingTabBtns.forEach(b => b.classList.remove('active')); // RENAMED
+            farmingTabContents.forEach(c => { // RENAMED
+                c.classList.remove('active');
+                c.style.display = 'none';
+            });
+            
+            // Add active class to clicked button and target content
+            btn.classList.add('active');
+            const targetId = btn.dataset.tab;
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) {
+                targetContent.classList.add('active');
+                targetContent.style.display = 'block';
+            }
+        });
+    });
+
+    // --- ADDED: Schemes Page Tabs ---
+    const schemesTabBtns = document.querySelectorAll('#schemesPage .tab-btn');
+    const schemesTabContents = document.querySelectorAll('#schemesPage .tab-content');
+    
+    schemesTabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            // Remove active class from all buttons and content
+            schemesTabBtns.forEach(b => b.classList.remove('active'));
+            schemesTabContents.forEach(c => {
+                c.classList.remove('active');
+                c.style.display = 'none';
+            });
+            
+            // Add active class to clicked button and target content
+            btn.classList.add('active');
+            const targetId = btn.dataset.tab;
+            const targetContent = document.getElementById(targetId);
+            if (targetContent) {
+                targetContent.classList.add('active');
+                targetContent.style.display = 'block';
+            }
+        });
+    });
+
+
+    // --- AI Chatbot (Live Gemini) ---
     const chatModal = document.getElementById('chatModal');
     const openChatBtn = document.getElementById('openChatBtn');
     const closeChatBtn = document.getElementById('closeChatBtn');
@@ -648,11 +1959,67 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
     
+    // --- Voice Advisory ---
+    const voiceAdvisoryBtn = document.getElementById('voiceAdvisoryBtn');
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.continuous = false;
+        recognition.lang = 'en-US'; 
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+
+        voiceAdvisoryBtn.addEventListener('click', () => {
+            try {
+                recognition.start();
+            } catch(e) {
+                console.error("Speech recognition already active or failed to start:", e);
+            }
+        });
+
+        recognition.onstart = () => {
+            voiceAdvisoryBtn.classList.add('listening');
+            voiceAdvisoryBtn.textContent = '...';
+        };
+
+        recognition.onspeechend = () => {
+            recognition.stop();
+        };
+        
+        recognition.onend = () => {
+             voiceAdvisoryBtn.classList.remove('listening');
+             voiceAdvisoryBtn.textContent = '🎤';
+        };
+        
+        recognition.onresult = (event) => {
+            const transcript = event.results[0][0].transcript;
+            chatInput.value = transcript; 
+            chatModal.classList.add('show'); 
+            sendChat(); 
+        };
+        
+        recognition.onerror = (event) => {
+            console.error("Speech recognition error", event.error);
+            if (event.error === 'no-speech') {
+                console.log("No speech detected.");
+            } else if (event.error === 'not-allowed') {
+                console.log("Microphone access denied.");
+            }
+            voiceAdvisoryBtn.classList.remove('listening');
+            voiceAdvisoryBtn.textContent = '🎤';
+        };
+    } else {
+        console.warn("Speech Recognition not supported in this browser.");
+        voiceAdvisoryBtn.style.display = 'none'; // Hide button if not supported
+    }
+
+    
     // --- Initial Load ---
     populateCrops();
+    switchLanguage('en'); // Apply default language on load
 });
 </script>
 
 </body>
 </html>
-
